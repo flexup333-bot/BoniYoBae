@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinFlux - Mutasi Saldo & Asisten Interaktif</title>
+    <title>FinFlux - Mutasi Saldo & Duo Asisten Interaktif</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -14,16 +14,28 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom Keyframes for Animations */
+        /* Mascot Keyframe Animations */
         @keyframes idleBounce {
             0%, 100% { transform: translateY(0) scaleY(1) scaleX(1); }
-            50% { transform: translateY(-8px) scaleY(1.03) scaleX(0.97); }
+            50% { transform: translateY(-6px) scaleY(1.04) scaleX(0.96); }
+        }
+        @keyframes foxIdle {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(2deg); }
+        }
+        @keyframes tailWag {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+        }
+        @keyframes cloudDrift {
+            0% { transform: translateX(-110%); }
+            100% { transform: translateX(110%); }
         }
         @keyframes jumpActive {
             0% { transform: translateY(0) scaleY(0.9) scaleX(1.1); }
             15% { transform: translateY(-40px) scaleY(1.1) scaleX(0.9) rotate(15deg); }
-            50% { transform: translateY(-80px) scaleY(1) scaleX(1) rotate(180deg); }
-            85% { transform: translateY(-20px) scaleY(1.05) scaleX(0.95) rotate(340deg); }
+            50% { transform: translateY(-70px) scaleY(1) scaleX(1) rotate(180deg); }
+            85% { transform: translateY(-15px) scaleY(1.05) scaleX(0.95) rotate(340deg); }
             100% { transform: translateY(0) scaleY(1) scaleX(1) rotate(360deg); }
         }
         @keyframes shake {
@@ -31,8 +43,24 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+        /* New Wind Sweep Animation */
+        @keyframes windSweep {
+            0% { transform: translateX(-120%) scaleX(0.4); opacity: 0; }
+            30% { opacity: 0.25; }
+            70% { opacity: 0.25; }
+            100% { transform: translateX(120%) scaleX(1.6); opacity: 0; }
+        }
+        
+        /* Animation Classes */
         .mascot-idle {
-            animation: idleBounce 3s ease-in-out infinite;
+            animation: idleBounce 3.2s ease-in-out infinite;
+        }
+        .fox-idle {
+            animation: foxIdle 2.8s ease-in-out infinite;
+        }
+        .fox-tail {
+            transform-origin: 45px 75px;
+            animation: tailWag 1.5s ease-in-out infinite;
         }
         .mascot-jump {
             animation: jumpActive 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
@@ -40,29 +68,56 @@
         .shake-effect {
             animation: shake 0.3s ease-in-out;
         }
+        .cloud-anim-1 {
+            animation: cloudDrift 45s linear infinite;
+        }
+        .cloud-anim-2 {
+            animation: cloudDrift 65s linear infinite;
+        }
+        /* Wind element animations classes */
+        .wind-line-1 {
+            animation: windSweep 7s linear infinite;
+        }
+        .wind-line-2 {
+            animation: windSweep 11s linear infinite 2.5s;
+        }
+        .wind-line-3 {
+            animation: windSweep 9s linear infinite 5s;
+        }
+        
         /* Glassmorphism utility */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
+
+        /* Mascot States Visibility via CSS */
+        .health-good .boni-happy { display: block; }
+        .health-good .boni-sad { display: none; }
+        .health-bad .boni-happy { display: none; }
+        .health-bad .boni-sad { display: block; }
+
+        .health-good .popon-happy { display: block; }
+        .health-good .popon-sad { display: none; }
+        .health-bad .popon-happy { display: none; }
+        .health-bad .popon-sad { display: block; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden pb-12">
 
     <!-- TOP NAVBAR -->
-    <header class="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md px-4 sm:px-6 py-4 flex items-center justify-between">
+    <header class="sticky top-0 z-40 w-full border-b border-slate-900 bg-slate-950/80 backdrop-blur-md px-4 sm:px-6 py-4 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="bg-gradient-to-tr from-emerald-400 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/15">
-                <!-- Wallet Icon SVG -->
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
             </div>
             <div>
                 <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">FinFlux</h1>
-                <p class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Personal Mutation Engine</p>
+                <p class="text-[10px] text-indigo-400 font-semibold tracking-wider uppercase">Personal Mutation Engine</p>
             </div>
         </div>
 
@@ -78,7 +133,7 @@
             </div>
             <button onclick="switchTab('settings')" class="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31(2.37)-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
             </button>
@@ -88,69 +143,204 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- LEFT COLUMN: Mascot & Form Controls (Lg: 4 cols) -->
-        <div class="lg:col-span-4 flex flex-col space-y-6">
+        <!-- LEFT COLUMN: Playground & Form Controls (Lg: 5 cols) -->
+        <div class="lg:col-span-5 flex flex-col space-y-6">
             
-            <!-- MASCOT CARD (Boni Si Celengan) -->
-            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center text-center shadow-xl border-indigo-500/10">
-                <!-- Dynamic background aura -->
-                <div class="absolute -top-12 -left-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-                <!-- Boni Mascot Container -->
-                <div class="relative w-36 h-36 flex items-center justify-center cursor-pointer" onclick="mascotJumpAndSpeak()">
-                    <!-- Click suggestion -->
-                    <span class="absolute top-0 right-0 text-[10px] bg-indigo-600/30 text-indigo-300 font-semibold px-2 py-0.5 rounded-full border border-indigo-500/30 animate-pulse">Tap Me!</span>
-                    
-                    <!-- SVG Character Boni -->
-                    <svg id="boniMascot" class="w-28 h-28 mascot-idle transition-all duration-300 transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Piggy/Coin Body -->
-                        <rect x="15" y="25" width="70" height="60" rx="30" fill="url(#pigGrad)" stroke="#4f46e5" stroke-width="2.5" />
-                        <!-- Shiny/Highlight -->
-                        <path d="M25 35 Q 50 28 75 35" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
-                        <!-- Piggy Snout -->
-                        <rect x="40" y="55" width="20" height="14" rx="7" fill="#818cf8" stroke="#4f46e5" stroke-width="2"/>
-                        <circle cx="46" cy="62" r="2.5" fill="#312e81"/>
-                        <circle cx="54" cy="62" r="2.5" fill="#312e81"/>
-                        <!-- Cute Eyes -->
-                        <!-- Left eye -->
-                        <g id="leftEye">
-                            <circle cx="33" cy="46" r="6" fill="#1e1b4b"/>
-                            <circle cx="31" cy="44" r="2" fill="white"/>
-                        </g>
-                        <!-- Right eye -->
-                        <g id="rightEye">
-                            <circle cx="67" cy="46" r="6" fill="#1e1b4b"/>
-                            <circle cx="65" cy="44" r="2" fill="white"/>
-                        </g>
-                        <!-- Rosie Cheeks -->
-                        <circle cx="25" cy="54" r="4.5" fill="#f43f5e" opacity="0.6"/>
-                        <circle cx="75" cy="54" r="4.5" fill="#f43f5e" opacity="0.6"/>
-                        <!-- Coin Slot (Top) -->
-                        <rect x="42" y="16" width="16" height="6" rx="3" fill="#1e1b4b" />
-                        <rect x="46" y="10" width="8" height="12" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" />
-                        <!-- Little Cute Legs -->
-                        <rect x="30" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
-                        <rect x="60" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
-
-                        <!-- Gradients definition -->
+            <!-- MASCOT PLAYGROUND WITH SCENERY & DUAL MASCOTS (Boni & Popon) -->
+            <div id="mascotPlayground" class="health-good glass-panel rounded-3xl relative overflow-hidden flex flex-col shadow-2xl border-indigo-500/10 h-[310px] justify-between">
+                
+                <!-- SVG SCENERY BACKGROUND WITH INTEGRATED WIND GUSTS -->
+                <div class="absolute inset-0 z-0 pointer-events-none">
+                    <!-- Sky & Stars/Sun -->
+                    <svg class="w-full h-full" viewBox="0 0 400 250" preserveAspectRatio="none">
+                        <!-- Sky Gradient based on status (overridden dynamically via JS) -->
                         <defs>
-                            <linearGradient id="pigGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#a5b4fc" />
-                                <stop offset="50%" stop-color="#818cf8" />
-                                <stop offset="100%" stop-color="#6366f1" />
+                            <linearGradient id="skyGood" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#0f172a" />
+                                <stop offset="70%" stop-color="#1e1b4b" />
+                                <stop offset="100%" stop-color="#311042" />
+                            </linearGradient>
+                            <linearGradient id="skyBad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#020617" />
+                                <stop offset="70%" stop-color="#1c1917" />
+                                <stop offset="100%" stop-color="#291515" />
                             </linearGradient>
                         </defs>
+                        <rect id="scenerySky" width="400" height="250" fill="url(#skyGood)" />
+
+                        <!-- Decorative Stars (Always there in dark theme) -->
+                        <circle cx="45" cy="35" r="1" fill="#fff" opacity="0.8"/>
+                        <circle cx="120" cy="20" r="1.5" fill="#fff" opacity="0.5"/>
+                        <circle cx="280" cy="45" r="1" fill="#fff" opacity="0.9"/>
+                        <circle cx="340" cy="25" r="1.2" fill="#fff" opacity="0.6"/>
+
+                        <!-- Glowing Moon -->
+                        <circle id="sceneryMoon" cx="330" cy="50" r="15" fill="#fef08a" opacity="0.15"/>
+                        <circle cx="330" cy="50" r="10" fill="#fef08a" opacity="0.8"/>
+
+                        <!-- Clouds drifting in background -->
+                        <g opacity="0.25" class="cloud-anim-1">
+                            <path d="M 10 80 Q 25 70 40 80 Q 55 70 70 80 L 70 95 L 10 95 Z" fill="#94a3b8"/>
+                        </g>
+                        <g opacity="0.15" class="cloud-anim-2">
+                            <path d="M 280 60 Q 295 50 310 60 Q 325 50 340 60 L 340 75 L 280 75 Z" fill="#94a3b8"/>
+                        </g>
+
+                        <!-- Distant Hills -->
+                        <path d="M -20 180 Q 90 140 200 180 Q 310 140 420 180 L 420 250 L -20 250 Z" fill="#1e1b4b" opacity="0.5" />
+                        
+                        <!-- VISUAL WIND SWEEP EFFECTS (Swooshing across the hills) -->
+                        <g stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.8" stroke-linecap="round" fill="none">
+                            <path class="wind-line-1" d="M -100 100 Q 50 85 150 115 T 450 95" />
+                            <path class="wind-line-2" d="M -100 140 Q 80 160 220 135 T 500 145" />
+                            <path class="wind-line-3" d="M -100 75 Q 40 60 180 85 T 480 70" />
+                        </g>
+
+                        <!-- Foreground Hill/Grass -->
+                        <path d="M -20 205 Q 110 175 220 205 Q 330 180 420 210 L 420 250 L -20 250 Z" fill="#0f172a" />
                     </svg>
                 </div>
 
-                <!-- Boni Speech Bubble -->
-                <div class="mt-4 w-full bg-slate-900 border border-slate-800 rounded-xl p-3 relative shadow-inner">
-                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-900 border-t border-l border-slate-800 rotate-45"></div>
-                    <p id="boniSpeech" class="text-xs sm:text-sm font-medium text-slate-300">
-                        "Halo bos! Yuk catat semua pengeluaran kamu biar analisis keuangan kamu makin akurat!"
-                    </p>
+                <!-- Floating Fireflies (Warm Ambient Dots) -->
+                <div class="absolute inset-x-0 top-16 h-28 pointer-events-none z-10">
+                    <div class="absolute left-[15%] top-[20%] w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse blur-[1px]"></div>
+                    <div class="absolute right-[25%] top-[40%] w-1 h-1 bg-amber-400 rounded-full animate-pulse delay-700"></div>
+                    <div class="absolute left-[45%] top-[60%] w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse delay-1000 blur-[1px]"></div>
                 </div>
+
+                <!-- Title Banner -->
+                <div class="relative z-10 px-4 pt-3 flex justify-between items-center w-full">
+                    <span class="text-[10px] font-bold tracking-widest text-indigo-300 uppercase bg-indigo-950/80 border border-indigo-500/20 px-2 py-0.5 rounded-full">Duo Fin-Buddy</span>
+                    <span id="playgroundStatus" class="text-[10px] font-extrabold text-emerald-400 uppercase">Taman Sehat 🌳</span>
+                </div>
+
+                <!-- MASCOTS LAYER (Boni & Popon side by side) -->
+                <div class="relative z-10 flex items-end justify-center px-6 pb-2 space-x-6 h-[140px]">
+                    
+                    <!-- BONI (Si Celengan Koin) -->
+                    <div class="relative w-24 h-24 flex flex-col items-center cursor-pointer" onclick="clickBoni()">
+                        <!-- Tap Label -->
+                        <span class="absolute -top-6 text-[8px] bg-indigo-500/80 text-white font-bold px-1.5 py-0.2 rounded shadow">BONI</span>
+                        
+                        <!-- SVG Mascot Boni -->
+                        <svg id="boniMascot" class="w-20 h-20 mascot-idle transition-all duration-300 transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Piggy Body -->
+                            <rect x="15" y="25" width="70" height="60" rx="30" fill="url(#pigGrad)" stroke="#4f46e5" stroke-width="2.5" />
+                            <path d="M25 35 Q 50 28 75 35" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Snout -->
+                            <rect x="40" y="55" width="20" height="14" rx="7" fill="#818cf8" stroke="#4f46e5" stroke-width="2"/>
+                            <circle cx="46" cy="62" r="2.5" fill="#312e81"/>
+                            <circle cx="54" cy="62" r="2.5" fill="#312e81"/>
+                            
+                            <!-- HAPPY EYES (Visible in health-good state) -->
+                            <g class="boni-happy">
+                                <circle cx="33" cy="46" r="6" fill="#1e1b4b"/>
+                                <circle cx="31" cy="44" r="2" fill="white"/>
+                                <circle cx="67" cy="46" r="6" fill="#1e1b4b"/>
+                                <circle cx="65" cy="44" r="2" fill="white"/>
+                                <!-- Happy blush -->
+                                <circle cx="24" cy="54" r="4" fill="#f43f5e" opacity="0.6"/>
+                                <circle cx="76" cy="54" r="4" fill="#f43f5e" opacity="0.6"/>
+                            </g>
+
+                            <!-- SAD EYES (Visible in health-bad state) -->
+                            <g class="boni-sad">
+                                <!-- Drooping Worried Eyes -->
+                                <path d="M28 48 Q 33 42 38 48" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <path d="M62 48 Q 67 42 72 48" stroke="#1e1b4b" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                                <!-- Tear droplets -->
+                                <circle cx="35" cy="54" r="2.5" fill="#38bdf8"/>
+                                <!-- Paler blush -->
+                                <circle cx="24" cy="54" r="3" fill="#f43f5e" opacity="0.2"/>
+                                <circle cx="76" cy="54" r="3" fill="#f43f5e" opacity="0.2"/>
+                            </g>
+
+                            <!-- Coin Slot -->
+                            <rect x="42" y="16" width="16" height="6" rx="3" fill="#1e1b4b" />
+                            <rect x="46" y="10" width="8" height="12" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" />
+                            <!-- Legs -->
+                            <rect x="30" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
+                            <rect x="60" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
+
+                            <defs>
+                                <linearGradient id="pigGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#a5b4fc" />
+                                    <stop offset="50%" stop-color="#818cf8" />
+                                    <stop offset="100%" stop-color="#6366f1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- POPON (Si Rubah / Fox) -->
+                    <div class="relative w-24 h-24 flex flex-col items-center cursor-pointer" onclick="clickPopon()">
+                        <!-- Tap Label -->
+                        <span class="absolute -top-6 text-[8px] bg-orange-600/80 text-white font-bold px-1.5 py-0.2 rounded shadow">POPON</span>
+                        
+                        <!-- SVG Mascot Popon -->
+                        <svg id="poponMascot" class="w-20 h-20 fox-idle transition-all duration-300 transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Popon Tail (Wagging) -->
+                            <path class="fox-tail" d="M35 75 Q 15 70 12 50 Q 20 38 35 60 Z" fill="#ea580c" stroke="#c2410c" stroke-width="1.5" />
+                            <path class="fox-tail" d="M12 50 Q 15 45 20 52 Z" fill="#f8fafc" /> <!-- Tail white tip -->
+
+                            <!-- Body -->
+                            <rect x="25" y="45" width="50" height="40" rx="20" fill="#f97316" stroke="#c2410c" stroke-width="1.8" />
+                            <!-- White chest -->
+                            <path d="M40 55 Q 50 72 60 55 Q 50 82 40 55 Z" fill="#f8fafc" />
+
+                            <!-- Pointy Ears -->
+                            <!-- Left Ear -->
+                            <polygon points="25,40 12,15 38,30" fill="#ea580c" stroke="#c2410c" stroke-width="1.5" />
+                            <polygon points="23,35 16,19 32,28" fill="#fecdd3" />
+                            <!-- Right Ear -->
+                            <polygon points="75,40 88,15 62,30" fill="#ea580c" stroke="#c2410c" stroke-width="1.5" />
+                            <polygon points="73,35 84,19 68,28" fill="#fecdd3" />
+
+                            <!-- Head base -->
+                            <path d="M22 45 Q 50 28 78 45 Q 85 62 50 65 Q 15 62 22 45 Z" fill="#f97316" stroke="#c2410c" stroke-width="1.8" />
+                            
+                            <!-- White Cheeks -->
+                            <path d="M22 45 Q 35 55 50 54 Q 65 55 78 45 Q 65 64 50 64 Q 35 64 22 45 Z" fill="#f8fafc" />
+
+                            <!-- Snout & Nose -->
+                            <circle cx="50" cy="54" r="4" fill="#0f172a" />
+
+                            <!-- HAPPY STATE FACIALS -->
+                            <g class="popon-happy">
+                                <!-- Curved Smiling Eyes -->
+                                <path d="M32 44 Q 38 38 44 44" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                                <path d="M56 44 Q 62 38 68 44" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                                <!-- Cheerful blush -->
+                                <circle cx="28" cy="50" r="3.5" fill="#f43f5e" opacity="0.6"/>
+                                <circle cx="72" cy="50" r="3.5" fill="#f43f5e" opacity="0.6"/>
+                            </g>
+
+                            <!-- SAD STATE FACIALS -->
+                            <g class="popon-sad">
+                                <!-- Slanted Worried Eyes -->
+                                <path d="M32 40 L 42 45" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
+                                <path d="M68 40 L 58 45" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
+                                <!-- Worried sweat drop -->
+                                <path d="M74 46 Q 76 52 72 52 Z" fill="#38bdf8" />
+                            </g>
+
+                            <!-- Cute Little Paws -->
+                            <circle cx="38" cy="84" r="5" fill="#ea580c" stroke="#c2410c" stroke-width="1.5" />
+                            <circle cx="62" cy="84" r="5" fill="#ea580c" stroke="#c2410c" stroke-width="1.5" />
+                        </svg>
+                    </div>
+
+                </div>
+
+                <!-- DIALOGUE SPEECH BUBBLE -->
+                <div class="relative z-10 px-4 pb-4 w-full">
+                    <div class="bg-slate-950/90 border border-slate-800/80 rounded-2xl p-3 shadow-inner">
+                        <p id="boniSpeech" class="text-xs font-semibold text-slate-200 leading-relaxed text-center">
+                            <span id="speakerLabel" class="text-indigo-400">Boni:</span> <span id="dialogueText">"Halo bos! Ketuk kami untuk mendengar nasihat, rumus cerdas, serta kutipan legendaris para maestro finansial dunia!"</span>
+                        </p>
+                    </div>
+                </div>
+
             </div>
 
             <!-- QUICK TRANSACTION FORM -->
@@ -165,25 +355,25 @@
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Klasifikasi Akun</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 transition text-center">
                                 <input type="radio" name="category" value="beban operasional" checked class="sr-only">
                                 <span class="text-xs font-bold text-amber-400">Operasional</span>
-                                <span class="text-[9px] text-slate-400">Kebutuhan Harian</span>
+                                <span class="text-[9px] text-slate-500 font-medium">Beban Pokok</span>
                             </label>
-                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 transition text-center">
                                 <input type="radio" name="category" value="investasi" class="sr-only">
                                 <span class="text-xs font-bold text-violet-400">Investasi</span>
-                                <span class="text-[9px] text-slate-400">Masa Depan</span>
+                                <span class="text-[9px] text-slate-500 font-medium">Produktif</span>
                             </label>
-                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 transition text-center">
                                 <input type="radio" name="category" value="aset" class="sr-only">
                                 <span class="text-xs font-bold text-emerald-400">Aset</span>
-                                <span class="text-[9px] text-slate-400">Benda Berharga</span>
+                                <span class="text-[9px] text-slate-500 font-medium">Harta Nyata</span>
                             </label>
-                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 transition text-center">
                                 <input type="radio" name="category" value="beban lainnya" class="sr-only">
                                 <span class="text-xs font-bold text-rose-400">Lainnya</span>
-                                <span class="text-[9px] text-slate-400">Biaya Tambahan</span>
+                                <span class="text-[9px] text-slate-500 font-medium">Biaya Ekstra</span>
                             </label>
                         </div>
                     </div>
@@ -191,17 +381,17 @@
                     <!-- Description Input -->
                     <div>
                         <label for="desc" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Deskripsi Transaksi</label>
-                        <input type="text" id="desc" required placeholder="Beli kopi, Bayar Kos, Nabung Saham..." 
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                        <input type="text" id="desc" required placeholder="Sewa kos, Beli reksadana, Makan siang..." 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
                     </div>
 
-                    <!-- Amount Input -->
+                    <!-- Amount Input (Formatted dynamically with commas) -->
                     <div>
                         <label for="amount" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Jumlah (Rupiah)</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
-                            <input type="number" id="amount" required min="1" placeholder="0" 
-                                class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                            <input type="text" id="amount" required placeholder="0" oninput="formatAmountInput(this)"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm font-extrabold text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
                         </div>
                     </div>
 
@@ -213,7 +403,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 active:scale-[0.98] transition duration-200 flex items-center justify-center space-x-2">
+                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 active:scale-[0.98] transition duration-200 flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -223,8 +413,8 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Dashboard & Analytics Engine (Lg: 8 cols) -->
-        <div class="lg:col-span-8 flex flex-col space-y-6">
+        <!-- RIGHT COLUMN: Dashboard & Analytics Engine (Lg: 7 cols) -->
+        <div class="lg:col-span-7 flex flex-col space-y-6">
             
             <!-- VIEW TABS NAVIGATION -->
             <div class="flex items-center space-x-2 p-1 bg-slate-900 border border-slate-800 rounded-xl max-w-lg">
@@ -232,7 +422,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
-                    <span>Analisis Dashboard</span>
+                    <span>Dashboard</span>
                 </button>
                 <button onclick="switchTab('transactions')" id="btnTabTransactions" class="tab-btn flex-1 flex items-center justify-center space-x-2 py-2 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +434,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    <span>GAS Integration</span>
+                    <span>Koneksi GAS</span>
                 </button>
             </div>
 
@@ -255,37 +445,37 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <!-- CARD 1: OPERASIONAL -->
                     <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Operasional</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Operasional</span>
                         <div class="mt-2">
                             <p id="totalOperasional" class="text-base sm:text-lg font-extrabold text-amber-400">Rp 0</p>
-                            <p class="text-[10px] text-slate-500 mt-1">Konsumsi Harian</p>
+                            <p class="text-[9px] text-slate-500 mt-1">Konsumsi Harian</p>
                         </div>
                     </div>
 
                     <!-- CARD 2: INVESTASI -->
                     <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Investasi</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Investasi</span>
                         <div class="mt-2">
                             <p id="totalInvestasi" class="text-base sm:text-lg font-extrabold text-violet-400">Rp 0</p>
-                            <p class="text-[10px] text-slate-500 mt-1">Aset Produktif</p>
+                            <p class="text-[9px] text-slate-500 mt-1">Masa Depan</p>
                         </div>
                     </div>
 
                     <!-- CARD 3: ASET -->
                     <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Aset Fisik</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Aset</span>
                         <div class="mt-2">
                             <p id="totalAset" class="text-base sm:text-lg font-extrabold text-emerald-400">Rp 0</p>
-                            <p class="text-[10px] text-slate-500 mt-1">Harta Tersimpan</p>
+                            <p class="text-[9px] text-slate-500 mt-1">Harta Bertambah</p>
                         </div>
                     </div>
 
                     <!-- CARD 4: BEBAN LAINNYA -->
                     <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Lainnya</span>
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Lainnya</span>
                         <div class="mt-2">
                             <p id="totalLainnya" class="text-base sm:text-lg font-extrabold text-rose-400">Rp 0</p>
-                            <p class="text-[10px] text-slate-500 mt-1">Biaya Tambahan</p>
+                            <p class="text-[9px] text-slate-500 mt-1">Tambahan Ekstra</p>
                         </div>
                     </div>
                 </div>
@@ -296,9 +486,9 @@
                     <div class="glass-panel p-5 rounded-2xl md:col-span-5 flex flex-col justify-between shadow-xl">
                         <div>
                             <h4 class="text-sm font-bold text-slate-200 mb-1">Proporsi Akun</h4>
-                            <p class="text-xs text-slate-400 mb-4">Pengeluaran berdasarkan tipe mutasi</p>
+                            <p class="text-xs text-slate-400 mb-4 font-medium">Beban keluar berdasarkan klasifikasi</p>
                         </div>
-                        <div class="relative w-full max-w-[200px] mx-auto aspect-square flex items-center justify-center">
+                        <div class="relative w-full max-w-[170px] mx-auto aspect-square flex items-center justify-center">
                             <canvas id="proporsiChart"></canvas>
                         </div>
                         <div class="mt-4 space-y-1 text-xs">
@@ -313,7 +503,7 @@
                     <div class="glass-panel p-5 rounded-2xl md:col-span-7 flex flex-col justify-between shadow-xl">
                         <div>
                             <h4 class="text-sm font-bold text-slate-200 mb-1">Tren Mingguan</h4>
-                            <p class="text-xs text-slate-400 mb-4">Grafik fluktuasi 7 transaksi terakhir</p>
+                            <p class="text-xs text-slate-400 mb-4 font-medium">Grafik fluktuasi 7 transaksi terakhir</p>
                         </div>
                         <div class="relative w-full h-[180px]">
                             <canvas id="trenChart"></canvas>
@@ -328,10 +518,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                         </svg>
                     </div>
-                    <div class="flex-1">
+                    <div class="flex-1 text-center md:text-left">
                         <h4 class="text-sm font-bold text-slate-200">Rekomendasi Analisis Cerdas</h4>
-                        <p id="financeRecommendation" class="text-xs text-slate-400 mt-1">
-                            "Menganalisis pola alokasi uang Anda... Yuk tambahkan minimal 3 transaksi untuk mendapatkan saran berharga dari AI Asisten Boni!"
+                        <p id="financeRecommendation" class="text-xs text-slate-400 mt-1 leading-relaxed">
+                            "Menganalisis pola alokasi uang Anda... Yuk tambahkan minimal 3 transaksi untuk mendapatkan saran berharga dari Duo Asisten Boni & Popon!"
                         </p>
                     </div>
                 </div>
@@ -344,7 +534,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 pb-4 border-b border-slate-800">
                         <div>
                             <h3 class="text-base font-bold text-slate-100">Daftar Transaksi Pribadi</h3>
-                            <p class="text-xs text-slate-400">Laporan mutasi keluar Anda secara detail</p>
+                            <p class="text-xs text-slate-400 font-medium">Laporan mutasi keluar Anda secara detail</p>
                         </div>
                         
                         <!-- Search & Filter Area -->
@@ -374,14 +564,14 @@
                                     <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="transactionList" class="divide-y divide-slate-800/40 text-xs text-slate-300">
+                            <tbody id="transactionList" class="divide-y divide-slate-800/30 text-xs text-slate-300">
                                 <!-- Dynamic Rows Go Here -->
                             </tbody>
                         </table>
                         
                         <!-- Empty State -->
                         <div id="emptyState" class="hidden flex flex-col items-center justify-center py-12 text-center">
-                            <svg class="w-12 h-12 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-12 h-12 text-slate-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                             <p class="text-sm font-semibold text-slate-400">Belum ada mutasi keuangan</p>
@@ -400,10 +590,10 @@
                         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         </svg>
-                        <span>Sinkronisasi Google Spreadsheet</span>
+                        <span>Koneksi Google Spreadsheet Pribadi</span>
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1 mb-4">
-                        Gunakan Google Sheets milik Anda sendiri sebagai database cloud pribadi! Tempel tautan Web App dari deployment Google Apps Script Anda.
+                    <p class="text-xs text-slate-400 mt-1 mb-4 leading-relaxed">
+                        Gunakan Google Sheets milik Anda sendiri sebagai database cloud pribadi! Tempel tautan Web App hasil Deployment Google Apps Script Anda di sini.
                     </p>
 
                     <div class="space-y-4">
@@ -416,16 +606,16 @@
                                     Hubungkan
                                 </button>
                                 <button onclick="disconnectGas()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs py-3 px-4 rounded-xl transition">
-                                    Disconnect
+                                    Putus
                                 </button>
                             </div>
-                            <span class="text-[10px] text-slate-500 mt-1.5 block">Jika kosong, aplikasi akan berjalan dalam mode offline (menyimpan data di memori browser lokal).</span>
+                            <span class="text-[10px] text-slate-500 mt-1.5 block">Jika tidak dihubungkan, semua mutasi akan disimpan otomatis di penyimpanan lokal browser Anda.</span>
                         </div>
 
-                        <!-- NEW: Force Sync & Initial Import/Export Button -->
+                        <!-- Force Sync & Initial Import/Export Button -->
                         <div id="gasUtilityBox" class="hidden p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-3">
-                            <h4 class="text-xs font-bold text-indigo-300">Utilitas Spreadsheet Tambahan</h4>
-                            <p class="text-[11px] text-slate-400">Spreadsheet Anda baru dan kosong? Anda dapat mengunggah 5 data contoh lokal Anda sekarang agar langsung terisi rapi dengan strukturnya.</p>
+                            <h4 class="text-xs font-bold text-indigo-300">Utilitas Sinkronisasi</h4>
+                            <p class="text-[11px] text-slate-400">Gunakan tombol berikut jika spreadsheet Anda masih kosong agar format data awal langsung terisi rapi.</p>
                             <div class="flex flex-wrap gap-2">
                                 <button onclick="uploadLocalDataToGas()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] py-2 px-3 rounded-lg transition flex items-center space-x-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -446,36 +636,34 @@
 
                 <!-- Google Apps Script Source Code & Tutorial -->
                 <div class="glass-panel p-5 rounded-2xl shadow-xl space-y-4">
-                    <h3 class="text-sm font-bold text-slate-200">Panduan 3 Langkah Penyusunan Database Spreadsheet Anda</h3>
+                    <h3 class="text-sm font-bold text-slate-200">Panduan Sinkronisasi Database Spreadsheet</h3>
                     
-                    <!-- Accordion or steps -->
                     <div class="space-y-3 text-xs text-slate-300">
-                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
-                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 1:</span> Buat sebuah Spreadsheet baru di Google Drive Anda. Berikan nama yang sesuai, contoh: <code class="bg-slate-950 px-1.5 py-0.5 rounded text-indigo-300">Mutasi Finansial FinFlux</code>.
+                        <div class="p-3 bg-slate-900/40 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 1:</span> Buat sebuah Spreadsheet kosong baru di Google Drive Anda.
                         </div>
-                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
-                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 2:</span> Klik <strong class="text-white">Ekstensi &gt; Apps Script</strong>. Hapus semua kode default dan tempelkan blok kode yang sudah kami sediakan di bawah ini.
+                        <div class="p-3 bg-slate-900/40 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 2:</span> Buka <strong class="text-white">Ekstensi &gt; Apps Script</strong>. Hapus semua kode default lalu salin dan tempelkan blok kode yang sudah kami sediakan di bawah ini.
                         </div>
-                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
-                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 3:</span> Klik tombol <strong class="text-white">Terapkan &gt; Penerapan Baru</strong>. Pilih jenis <strong class="text-white">Aplikasi Web</strong>. Ubah aksesnya menjadi <strong class="text-white">Siapa saja (Anyone)</strong> dan pastikan dijalankan sebagai <strong class="text-white">Diri Anda (Me)</strong>. Salin URL Aplikasi Web yang dihasilkan dan masukkan ke kotak input di atas!
+                        <div class="p-3 bg-slate-900/40 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 3:</span> Klik <strong class="text-white">Terapkan &gt; Penerapan Baru</strong>. Pilih jenis <strong class="text-white">Aplikasi Web</strong>. Ubah aksesnya menjadi <strong class="text-white">Siapa saja (Anyone)</strong> dan pastikan dijalankan sebagai <strong class="text-white">Diri Saya (Me)</strong>. Salin URL Aplikasi Web tersebut ke kotak input di atas!
                         </div>
                     </div>
 
                     <!-- Copyable Code Area -->
                     <div class="mt-4">
                         <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Kode Google Apps Script (.gs) - Versi Kompatibel Komplit</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Kode Google Apps Script (.gs)</span>
                             <button onclick="copyGasCode()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-1 px-2.5 rounded transition">
                                 Salin Kode
                             </button>
                         </div>
-                        <pre class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-[10px] font-mono text-emerald-400 overflow-x-auto max-h-[220px]">
-/* Kode Google Apps Script untuk Backend FinFlux - Mendukung Auto Header */
+                        <pre class="bg-slate-950 border border-slate-900 rounded-xl p-4 text-[10px] font-mono text-emerald-400 overflow-x-auto max-h-[160px]">
+/* Kode Google Apps Script untuk Backend FinFlux - Versi Auto Header & JSONP */
 
 function doGet(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
-  // Jika Spreadsheet masih kosong (tidak ada baris)
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
   }
@@ -483,7 +671,6 @@ function doGet(e) {
   var data = sheet.getDataRange().getValues();
   var result = [];
   
-  // Ambil data jika ada selain header
   for (var i = 1; i < data.length; i++) {
     result.push({
       id: data[i][0],
@@ -495,8 +682,6 @@ function doGet(e) {
   }
   
   var jsonString = JSON.stringify(result);
-  
-  // Deteksi callback untuk penanganan JSONP (Bypass pembatasan CORS peramban)
   var callback = e.parameter.callback;
   if (callback) {
     return ContentService.createTextOutput(callback + '(' + jsonString + ')')
@@ -512,7 +697,6 @@ function doPost(e) {
     var params = JSON.parse(e.postData.contents);
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    // Header setup otomatis jika sheet kosong
     if (sheet.getLastRow() == 0) {
       sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
     }
@@ -529,7 +713,6 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
     
-    // Tambah baris baru
     sheet.appendRow([
       params.id || Utilities.getUuid(),
       params.tanggal,
@@ -559,7 +742,7 @@ function doPost(e) {
         </div>
         <div class="flex-1">
             <h5 id="toastTitle" class="text-xs font-bold text-slate-100">Proses Berhasil</h5>
-            <p id="toastMessage" class="text-[11px] text-slate-400 mt-0.5">Pencatatan mutasi saldo telah direkam dengan sukses.</p>
+            <p id="toastMessage" class="text-[11px] text-slate-400 mt-0.5">Pencatatan mutasi saldo telah direkam.</p>
         </div>
     </div>
 
@@ -572,20 +755,84 @@ function doPost(e) {
             isSyncing: false
         };
 
-        // Mascot quotes database
-        const mascotQuotes = [
-            "Halo bos! Yuk catat semua pengeluaran kamu biar analisis keuangan kamu makin akurat!",
-            "Investasi adalah kunci kebebasan finansial di masa depan, jangan kendor ya!",
-            "Kebutuhan operasional harus tetap termonitor agar tidak terjadi kebocoran dompet!",
-            "Wah, asyik! Memperbanyak porsi Aset akan membuat masa tua kamu lebih tenang dan berkecukupan.",
-            "Setiap rupiah yang dikeluarkan punya cerita. Pastikan ceritanya bahagia, bukan penyesalan!",
-            "Ingat rumus keuangan legendaris: 50% Kebutuhan, 30% Keinginan, 20% Masa depan!",
-            "Boni senang melihat portofolio kamu semakin rapi dan terukur setiap harinya!"
+        // Mascot quotes database (Dual dialogue structure - Real financial advice/theories)
+        const conversations = [
+            { sender: "boni", text: "Guru Warren Buffett pernah berkata: 'Jangan menabung apa yang tersisa setelah dibelanjakan, tapi belanjakan apa yang tersisa setelah menabung!'" },
+            { sender: "popon", text: "Ah, itu legendaris! Kalau rumus Elizabeth Warren 50/30/20: 50% untuk kebutuhan pokok, 30% untuk keinginan, dan wajib investasikan 20% sisanya!" },
+            { sender: "boni", text: "Robert Kiyosaki juga selalu menegaskan: 'Aset sejati akan memasukkan uang ke kantongmu, sedangkan beban/liabilitas akan terus mengurasnya!'" },
+            { sender: "popon", text: "Betul sekali! Benjamin Graham mengajarkan kita untuk melihat fluktuasi pasar bukan sebagai musuh, melainkan sebagai peluang emas membeli diskon!" },
+            { sender: "boni", text: "Dave Ramsey memberi saran terbaik: 'Sebuah anggaran adalah cara kita menginstruksikan uang kemana harus mengalir, bukan membuat kita bingung kemana perginya.'" },
+            { sender: "popon", text: "Satu lagi dari Morgan Housel di The Psychology of Money: 'Tingkat tabungan Anda sesungguhnya adalah selisih antara ego Anda dan pendapatan Anda!'" }
+        ];
+
+        // Specific conversation pairs when things are BAD (Operasional > 60%)
+        const badConversations = [
+            { sender: "boni", text: "Waduh bos... Rasio operasional harian kamu melambung tinggi di atas 60%. Warren Buffett pasti menangis melihat ini!" },
+            { sender: "popon", text: "🚨 Peringatan Dave Ramsey: 'Kamu tidak akan pernah keluar dari lubang keuangan jika terus-menerus menggali lubang konsumsi yang lebih dalam!' Ayo hemat, bos!" },
+            { sender: "boni", text: "Ingat rumus 50/30/20! Sektor operasionalmu sudah melanggar batas aman 50%. Boni sangat khawatir..." },
+            { sender: "popon", text: "Kurangi ego belanjamu sekarang, bos! Popon bakal gigit kartu kreditmu kalau dipakai jajan impulsif lagi! 🦊" }
         ];
 
         // Chart References
         let proporsiChartObj = null;
         let trenChartObj = null;
+
+        // Custom Sound Generator using Web Audio API (Super robust, no external dependencies)
+        function playCuteSound(type) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const audioCtx = new AudioContext();
+                
+                if (type === 'boni') {
+                    // Cute high-pitch coin "Bling!" sound for Boni
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = "sine";
+                    // Dynamic retro twin-note effect
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.08); // A5
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.35);
+                } else if (type === 'popon') {
+                    // Cute fox squeak/chirp "Yap!" sound for Popon
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = "triangle";
+                    // Upward frequency slide (Pitch sweep)
+                    osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.10, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.16);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.16);
+                } else if (type === 'delete') {
+                    // Sad retro down-frequency pitch fall for row removal
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = "sawtooth";
+                    osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.28);
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.28);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.28);
+                }
+            } catch (err) {
+                console.warn("AudioContext block/unsupported by browser policies:", err);
+            }
+        }
 
         // On Document Load
         window.onload = function() {
@@ -601,9 +848,18 @@ function doPost(e) {
             renderData();
         };
 
+        // Live input masking to add commas for thousands
+        function formatAmountInput(input) {
+            let val = input.value.replace(/\D/g, "");
+            if (val) {
+                input.value = Number(val).toLocaleString("en-US");
+            } else {
+                input.value = "";
+            }
+        }
+
         // Save and Load State Utilities
         function loadAppState() {
-            // Load saved GAS URL
             const savedUrl = localStorage.getItem('finflux_gas_url');
             if (savedUrl) {
                 state.gasUrl = savedUrl;
@@ -613,12 +869,11 @@ function doPost(e) {
                 updateSyncIndicators(false);
             }
 
-            // Load locally cached transactions or load mockup data if empty
             const savedTx = localStorage.getItem('finflux_transactions');
             if (savedTx) {
                 state.transactions = JSON.parse(savedTx);
             } else {
-                // Pre-populate with beautiful default analytical data
+                // Default mock database with interesting analytical curves
                 state.transactions = [
                     { id: "1", tanggal: "2026-05-18", kategori: "beban operasional", deskripsi: "Makan Malam & Transport", jumlah: 125000 },
                     { id: "2", tanggal: "2026-05-19", kategori: "investasi", deskripsi: "Reksadana Saham Bulanan", jumlah: 500000 },
@@ -629,7 +884,6 @@ function doPost(e) {
                 saveToLocalCache();
             }
 
-            // If GAS URL is configured, pull fresh database
             if (state.gasUrl) {
                 fetchFromGas();
             }
@@ -641,19 +895,16 @@ function doPost(e) {
 
         // Tab switching controller
         function switchTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
                 btn.classList.add('text-slate-400', 'hover:text-slate-200');
             });
 
-            // Show active tab
             if (tabName === 'dashboard') {
                 document.getElementById('tabDashboard').classList.remove('hidden');
                 document.getElementById('btnTabDashboard').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
                 document.getElementById('btnTabDashboard').classList.remove('text-slate-400');
-                // Re-render charts to trigger correct sizing
                 setTimeout(initializeCharts, 100);
             } else if (tabName === 'transactions') {
                 document.getElementById('tabTransactions').classList.remove('hidden');
@@ -666,7 +917,6 @@ function doPost(e) {
             }
         }
 
-        // Toggle badge visibility depending on connection state
         function updateSyncIndicators(isConnected) {
             const localBadge = document.getElementById('syncBadge');
             const gasBadge = document.getElementById('gasActiveBadge');
@@ -682,7 +932,7 @@ function doPost(e) {
             }
         }
 
-        // GAS Settings action handlers
+        // GAS Connections Actions
         function saveGasUrl() {
             const urlInput = document.getElementById('gasUrlInput').value.trim();
             if (!urlInput) {
@@ -692,7 +942,7 @@ function doPost(e) {
             state.gasUrl = urlInput;
             localStorage.setItem('finflux_gas_url', urlInput);
             updateSyncIndicators(true);
-            showToast("GAS Terhubung", "Konfigurasi backend Google Spreadsheet berhasil disimpan!", "success");
+            showToast("GAS Terhubung", "Konfigurasi database cloud berhasil disimpan!", "success");
             fetchFromGas();
         }
 
@@ -701,79 +951,27 @@ function doPost(e) {
             localStorage.removeItem('finflux_gas_url');
             document.getElementById('gasUrlInput').value = "";
             updateSyncIndicators(false);
-            showToast("Koneksi Diputus", "Berhasil beralih kembali ke Penyimpanan Lokal.", "success");
+            showToast("Koneksi Putus", "Kembali menggunakan database internal offline.", "success");
         }
 
         function copyGasCode() {
-            const scriptText = `function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
-  }
-  var data = sheet.getDataRange().getValues();
-  var result = [];
-  for (var i = 1; i < data.length; i++) {
-    result.push({
-      id: data[i][0],
-      tanggal: data[i][1],
-      kategori: data[i][2],
-      deskripsi: data[i][3],
-      jumlah: Number(data[i][4])
-    });
-  }
-  var jsonString = JSON.stringify(result);
-  var callback = e.parameter.callback;
-  if (callback) {
-    return ContentService.createTextOutput(callback + '(' + jsonString + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return ContentService.createTextOutput(jsonString).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  try {
-    var params = JSON.parse(e.postData.contents);
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    if (sheet.getLastRow() == 0) {
-      sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
-    }
-    if (params.action === "delete") {
-      var data = sheet.getDataRange().getValues();
-      for (var i = 1; i < data.length; i++) {
-        if (data[i][0] == params.id) {
-          sheet.deleteRow(i + 1);
-          break;
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
-    }
-    sheet.appendRow([params.id || Utilities.getUuid(), params.tanggal, params.kategori, params.deskripsi, params.jumlah]);
-    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({status: "error", message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-            
-            // Backup fallback execution
+            const scriptText = document.querySelector('pre').innerText;
             const dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
             dummy.value = scriptText;
             dummy.select();
             document.execCommand("copy");
             document.body.removeChild(dummy);
-            
-            showToast("Teks Disalin", "Kode Apps Script berhasil disalin ke clipboard Anda!", "success");
+            showToast("Teks Disalin", "Kode backend Google Apps Script siap ditempel!", "success");
         }
 
-        // Sync engine to interact with deployed Google Apps Script URL with robust CORS bypass
+        // Sync data with Spreadsheet using JSONP bypass method
         function fetchFromGas() {
             if (!state.gasUrl) return;
             showToast("Memuat Data", "Menghubungkan ke Google Sheets...", "success");
 
-            // Membuat ID callback unik berbasis waktu untuk menghindari cache
             const callbackName = "finflux_callback_" + Math.round(Math.random() * 1000000) + "_" + Date.now();
             
-            // Menyiapkan penampung callback global untuk menerima data JSONP
             window[callbackName] = function(data) {
                 cleanup();
                 if (Array.isArray(data)) {
@@ -786,20 +984,15 @@ function doPost(e) {
                     }));
                     saveToLocalCache();
                     renderData();
-                    showToast("Data Sinkron", "Berhasil sinkronisasi otomatis dengan Google Sheets!", "success");
-                } else {
-                    showToast("Kesalahan Data", "Format data spreadsheet tidak valid.", "error");
+                    showToast("Data Sinkron", "Mutasi terbaru disinkronkan dari Google Sheets!", "success");
                 }
             };
 
-            // Batas waktu tunggu (Timeout) koneksi ke GAS
             const timeoutId = setTimeout(() => {
                 cleanup();
-                showToast("Data Kosong / Lambat", "Spreadsheet mungkin kosong atau memuat lambat. Menggunakan data lokal.", "error");
-                console.warn("GAS Connection timed out or empty. Falling back to local cache.");
-            }, 12000);
+                showToast("Data Kosong / Timeout", "Membuka database lokal (Offline).", "error");
+            }, 10000);
 
-            // Membersihkan elemen script setelah selesai atau ketika gagal
             function cleanup() {
                 clearTimeout(timeoutId);
                 delete window[callbackName];
@@ -808,7 +1001,6 @@ function doPost(e) {
             }
 
             const scriptId = "gas_jsonp_loader";
-            // Memasang parameter callback dan melampirkan timestamp untuk mencegah caching peramban
             const urlConnector = state.gasUrl.includes('?') ? '&' : '?';
             const secureUrl = state.gasUrl + urlConnector + "callback=" + callbackName + "&nocache=" + Date.now();
 
@@ -817,18 +1009,16 @@ function doPost(e) {
             script.src = secureUrl;
             script.onerror = function() {
                 cleanup();
-                showToast("Gagal Memuat Cloud", "Terjadi masalah CORS/Jaringan. Menggunakan database lokal.", "error");
+                showToast("Koneksi Gagal", "Gagal memuat awan. Menggunakan memori lokal.", "error");
             };
 
             document.head.appendChild(script);
         }
 
-        // POST request bypass CORS via standard simple requests (no-cors mode with text/plain body)
+        // Post request bypassing CORS
         function postToGas(payload) {
             if (!state.gasUrl) return Promise.resolve({ status: "local" });
 
-            // Menggunakan fetch tipe 'no-cors' dengan tipe konten 'text/plain' 
-            // untuk mengelabui pembatasan pra-koneksi OPTIONS (CORS preflight) pada peramban
             return fetch(state.gasUrl, {
                 method: "POST",
                 mode: "no-cors",
@@ -837,53 +1027,43 @@ function doPost(e) {
                 },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                // Dalam mode 'no-cors', respons bersifat opak (tidak bisa dibaca isinya),
-                // tetapi permintaan dipastikan terkirim dengan aman ke Google Apps Script.
-                return { status: "success" };
-            })
+            .then(() => ({ status: "success" }))
             .catch(err => {
                 console.error("GAS Post Error: ", err);
                 throw err;
             });
         }
 
-        // NEW FEATURE: Upload all local cache to Spreadsheet dynamically
+        // Mass-export local data to empty Google Sheets
         async function uploadLocalDataToGas() {
             if (!state.gasUrl) return;
             if (state.transactions.length === 0) {
-                showToast("Gagal", "Tidak ada data lokal untuk diekspor.", "error");
+                showToast("Gagal", "Tidak ada mutasi lokal yang bisa diekspor.", "error");
                 return;
             }
 
-            showToast("Mulai Ekspor", "Mentransfer seluruh data lokal ke Google Sheets...", "success");
-            
-            let successCount = 0;
+            showToast("Memulai Ekspor", "Mentransfer data mutasi lokal...", "success");
+            let count = 0;
             for (let i = 0; i < state.transactions.length; i++) {
                 try {
                     await postToGas(state.transactions[i]);
-                    successCount++;
-                } catch (err) {
-                    console.error("Gagal mengunggah item: ", state.transactions[i]);
+                    count++;
+                } catch (e) {
+                    console.error(e);
                 }
             }
-
-            showToast("Ekspor Selesai", `Berhasil menulis ${successCount} transaksi ke Spreadsheet baru Anda!`, "success");
-            
-            // Jeda singkat lalu sync ulang dari GAS
+            showToast("Ekspor Selesai", `Tercatat ${count} mutasi di Google Spreadsheet!`, "success");
             setTimeout(fetchFromGas, 2000);
         }
 
-        // Transaction submission handling
+        // Form Submission handler
         function handleTransactionSubmit(event) {
             event.preventDefault();
 
-            // Form references
             const descInput = document.getElementById('desc');
             const amountInput = document.getElementById('amount');
             const dateInput = document.getElementById('date');
             
-            // Extract selected category
             let category = "beban operasional";
             const radioButtons = document.getElementsByName('category');
             for (const radio of radioButtons) {
@@ -893,73 +1073,76 @@ function doPost(e) {
                 }
             }
 
+            const rawAmount = Number(amountInput.value.replace(/,/g, ""));
+            if (isNaN(rawAmount) || rawAmount <= 0) {
+                showToast("Batal", "Harap masukkan angka jumlah yang valid.", "error");
+                return;
+            }
+
             const newTx = {
                 id: crypto.randomUUID(),
                 tanggal: dateInput.value,
                 kategori: category,
                 deskripsi: descInput.value.trim(),
-                jumlah: Number(amountInput.value)
+                jumlah: rawAmount
             };
 
-            // Trigger Mascot Double Jump Animation
-            triggerMascotJump();
+            // Trigger sound effects for submission (Combines both coin and pop chirps)
+            playCuteSound('boni');
+            setTimeout(() => playCuteSound('popon'), 100);
 
-            // Optimistic Update: Add to UI instantly
+            triggerMascotsInteract();
+
             state.transactions.unshift(newTx);
             saveToLocalCache();
             renderData();
 
-            // Reset Form fields elegantly
+            // Clear inputs
             descInput.value = "";
             amountInput.value = "";
-            
-            // Post to external Database if configured
+
             if (state.gasUrl) {
-                showToast("Mengirim...", "Menyimpan mutasi ke Google Sheets...", "success");
+                showToast("Menyimpan...", "Mentransfer ke Google Sheets...", "success");
                 postToGas(newTx)
                     .then(() => {
-                        showToast("Data Terkirim", "Transaksi tersimpan selamanya di Spreadsheet Anda!", "success");
-                        // Muat ulang setelah jeda singkat agar sinkron kembali
+                        showToast("Tersimpan Cloud", "Satu pengeluaran baru berhasil direkam di Cloud!", "success");
                         setTimeout(fetchFromGas, 1500);
                     })
                     .catch(() => {
-                        showToast("Koneksi Gagal", "Mutasi disimpan lokal. Kami akan coba kirim lagi nanti.", "error");
+                        showToast("Offline", "Mutasi disimpan lokal karena hambatan jaringan.", "error");
                     });
             } else {
-                showToast("Transaksi Disimpan", "Berhasil menambahkan mutasi ke penyimpanan lokal.", "success");
+                showToast("Tersimpan Lokal", "Berhasil menambahkan mutasi ke memori browser.", "success");
             }
         }
 
-        // Remove transaction
+        // Delete Row action
         function deleteTransaction(id) {
-            // Trigger mascot sad look or bounce
-            triggerMascotWiggle();
+            // Sad delete sound play
+            playCuteSound('delete');
+            triggerMascotsSadWiggle();
 
-            // Remove from local memory
             state.transactions = state.transactions.filter(tx => tx.id !== id);
             saveToLocalCache();
             renderData();
 
-            // Post delete action to Google Apps Script if connected
             if (state.gasUrl) {
-                showToast("Menghapus...", "Menghapus mutasi dari Google Sheets...", "success");
+                showToast("Menghapus...", "Memperbarui Google Sheets...", "success");
                 postToGas({ action: "delete", id: id })
                     .then(() => {
-                        showToast("Terhapus", "Satu mutasi berhasil dihapus dari cloud database Anda.", "success");
-                        // Muat ulang untuk sinkronisasi mutasi terbaru
+                        showToast("Terhapus", "Data mutasi telah disinkronkan keluar.", "success");
                         setTimeout(fetchFromGas, 1500);
                     })
                     .catch(() => {
-                        showToast("Penghapusan Tertunda", "Mutasi terhapus di lokal. Sinkronisasi tertunda.", "error");
+                        showToast("Terhapus Lokal", "Mutasi terhapus lokal, sinkronisasi tertunda.", "error");
                     });
             } else {
-                showToast("Berhasil Dihapus", "Satu mutasi berhasil dihapus secara lokal.", "success");
+                showToast("Berhasil Dihapus", "Satu baris mutasi terhapus.", "success");
             }
         }
 
-        // Main data render pipeline
+        // Render everything pipeline
         function renderData() {
-            // Calculate sums by category
             let operasionalSum = 0;
             let investasiSum = 0;
             let asetSum = 0;
@@ -982,24 +1165,79 @@ function doPost(e) {
                 }
             });
 
-            // Format monetary values
+            // Format DOM totals
             document.getElementById('totalOperasional').innerText = formatRupiah(operasionalSum);
             document.getElementById('totalInvestasi').innerText = formatRupiah(investasiSum);
             document.getElementById('totalAset').innerText = formatRupiah(asetSum);
             document.getElementById('totalLainnya').innerText = formatRupiah(lainnyaSum);
 
-            const totalMutasi = operasionalSum + investasiSum + asetSum + lainnyaSum;
-            document.getElementById('totalAlokasiChart').innerText = formatRupiah(totalMutasi);
+            const total = operasionalSum + investasiSum + asetSum + lainnyaSum;
+            document.getElementById('totalAlokasiChart').innerText = formatRupiah(total);
 
-            // Dynamically change tips based on highest expense
-            updateFinanceRecommendation(operasionalSum, investasiSum, asetSum, lainnyaSum);
+            // Handle Dynamic Mascot Reactions and Background Sky Shift
+            handleMascotMoods(operasionalSum, investasiSum, asetSum, lainnyaSum);
 
-            // Re-render components
             renderTableRows(state.transactions);
             initializeCharts();
         }
 
-        // Render Table Rows dynamically
+        // Dynamic Mascot expressions & UI feedback based on financial health
+        function handleMascotMoods(operasional, investasi, aset, lainnya) {
+            const playground = document.getElementById('mascotPlayground');
+            const statusText = document.getElementById('playgroundStatus');
+            const sky = document.getElementById('scenerySky');
+            const recommendationEl = document.getElementById('financeRecommendation');
+            const speakerLabel = document.getElementById('speakerLabel');
+            const dialogueText = document.getElementById('dialogueText');
+
+            const total = operasional + investasi + aset + lainnya;
+
+            if (total === 0) {
+                playground.className = "health-good glass-panel rounded-3xl relative overflow-hidden flex flex-col shadow-2xl border-indigo-500/10 h-[310px] justify-between";
+                statusText.innerText = "Taman Sehat 🌳";
+                statusText.className = "text-[10px] font-extrabold text-emerald-400 uppercase";
+                sky.setAttribute('fill', 'url(#skyGood)');
+                recommendationEl.innerText = "Mulai catat pengeluaran Anda hari ini agar kami bisa memberikan tips finansial yang akurat!";
+                return;
+            }
+
+            const opRatio = operasional / total;
+
+            // IF WE ARE EXCEEDING 60% ON OPERATIONAL SPENDING (Finances are Bad/Sad)
+            if (opRatio > 0.6) {
+                playground.className = "health-bad glass-panel rounded-3xl relative overflow-hidden flex flex-col shadow-2xl border-rose-500/10 h-[310px] justify-between";
+                statusText.innerText = "Zona Boros 🚨";
+                statusText.className = "text-[10px] font-extrabold text-rose-400 uppercase";
+                
+                sky.setAttribute('fill', 'url(#skyBad)');
+
+                recommendationEl.innerHTML = `🚨 <span class='text-rose-400 font-bold'>Beban Operasional</span> menyerap ${(opRatio * 100).toFixed(0)}% pengeluaran! Angka ini jauh melebihi batas ideal 50%. Ayo segera kurangi beban konsumtif!`;
+                
+                speakerLabel.innerText = "Boni:";
+                speakerLabel.className = "text-indigo-400 font-bold";
+                dialogueText.innerText = `"Aduh bos... beban operasional kita boros sekali hari ini. Boni sedih melihat rasio anggaran kita tidak sehat..."`;
+            } else {
+                playground.className = "health-good glass-panel rounded-3xl relative overflow-hidden flex flex-col shadow-2xl border-indigo-500/10 h-[310px] justify-between";
+                statusText.innerText = "Taman Sehat 🌳";
+                statusText.className = "text-[10px] font-extrabold text-emerald-400 uppercase";
+                
+                sky.setAttribute('fill', 'url(#skyGood)');
+
+                if (investasi / total > 0.2) {
+                    recommendationEl.innerHTML = `🌳 Rasio <span class='text-violet-400 font-bold'>Investasi</span> Anda istimewa (${((investasi/total)*100).toFixed(0)}%)! Ini sejalan dengan strategi aset produktif Robert Kiyosaki!`;
+                    speakerLabel.innerText = "Popon:";
+                    speakerLabel.className = "text-orange-400 font-bold";
+                    dialogueText.innerText = `"Rasio investasi bos luar biasa tinggi! Robert Kiyosaki pasti tersenyum lebar melihat disiplin finansial kita!"`;
+                } else {
+                    recommendationEl.innerHTML = `💡 Komposisi mutasi terkendali dengan baik. Rasio operasional terkunci aman di level ${(opRatio*100).toFixed(0)}%!`;
+                    speakerLabel.innerText = "Boni:";
+                    speakerLabel.className = "text-indigo-400 font-bold";
+                    dialogueText.innerText = `"Semua parameter terkendali aman, bos! Pertahankan kebiasaan bijak ini."`;
+                }
+            }
+        }
+
+        // Render Table list helper
         function renderTableRows(txArray) {
             const container = document.getElementById('transactionList');
             const emptyState = document.getElementById('emptyState');
@@ -1036,9 +1274,9 @@ function doPost(e) {
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-900/30 transition border-b border-slate-900/40";
+                tr.className = "hover:bg-slate-900/30 transition border-b border-slate-900/30";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-slate-400 text-[11px]">${formatDate(tx.tanggal)}</td>
+                    <td class="py-3 px-4 font-medium text-slate-500 text-[11px]">${formatDate(tx.tanggal)}</td>
                     <td class="py-3 px-4">
                         <span class="px-2 py-0.5 rounded-full border text-[10px] font-bold ${badgeColor}">
                             ${badgeText}
@@ -1058,7 +1296,6 @@ function doPost(e) {
             });
         }
 
-        // Table filtering based on search and selected category filter
         function filterTransactions() {
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const selectedCategory = document.getElementById('filterCategory').value;
@@ -1072,12 +1309,11 @@ function doPost(e) {
             renderTableRows(filtered);
         }
 
-        // Safe HTML utility
+        // Formatting utilities
         function escapeHtml(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        // Date formatter (e.g. 2026-05-22 -> 22 Mei 2026)
         function formatDate(dateStr) {
             if (!dateStr) return "-";
             const parts = dateStr.split('-');
@@ -1086,19 +1322,18 @@ function doPost(e) {
             return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
         }
 
-        // Format raw integer into Indonesian Rupiah format
+        // Format Rupiah
         function formatRupiah(value) {
             return 'Rp ' + value.toLocaleString('id-ID');
         }
 
-        // Chart.js engine initialization
+        // Initialize Charts (Doughnut and Bar)
         function initializeCharts() {
             const ctxProporsi = document.getElementById('proporsiChart');
             const ctxTren = document.getElementById('trenChart');
 
-            if (!ctxProporsi || !ctxTren) return; // guard clause for tabs
+            if (!ctxProporsi || !ctxTren) return;
 
-            // Sum the categories
             let opSum = 0, invSum = 0, astSum = 0, lainSum = 0;
             state.transactions.forEach(tx => {
                 if (tx.kategori === 'beban operasional') opSum += tx.jumlah;
@@ -1107,7 +1342,6 @@ function doPost(e) {
                 else if (tx.kategori === 'beban lainnya') lainSum += tx.jumlah;
             });
 
-            // 1. PROPORSI CHARTS (DOUGHNUT)
             if (proporsiChartObj) {
                 proporsiChartObj.destroy();
             }
@@ -1125,21 +1359,17 @@ function doPost(e) {
                     }]
                 },
                 options: {
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    cutout: '70%',
+                    plugins: { legend: { display: false } },
+                    cutout: '72%',
                     responsive: true,
                     maintainAspectRatio: true
                 }
             });
 
-            // 2. TREN CHART (BAR - Shows 7 latest transactions)
             if (trenChartObj) {
                 trenChartObj.destroy();
             }
 
-            // Get last 7 transactions, reverse it to show chronologically
             const sortedTx = [...state.transactions]
                 .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
                 .slice(-7);
@@ -1168,9 +1398,7 @@ function doPost(e) {
                     }]
                 },
                 options: {
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -1179,14 +1407,14 @@ function doPost(e) {
                             ticks: { color: '#94a3b8', font: { size: 9 } }
                         },
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            grid: { color: 'rgba(255,255,255,0.04)' },
                             ticks: { 
                                 color: '#94a3b8', 
                                 font: { size: 9 },
-                                callback: function(value) {
-                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-                                    if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
-                                    return value;
+                                callback: function(val) {
+                                    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                                    if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+                                    return val;
                                 }
                             }
                         }
@@ -1195,62 +1423,73 @@ function doPost(e) {
             });
         }
 
-        // Smarter recommendations based on current spending ratio
-        function updateFinanceRecommendation(operasional, investasi, aset, lainnya) {
-            const recommendationEl = document.getElementById('financeRecommendation');
-            const total = operasional + investasi + aset + lainnya;
+        // Mascot Animations triggering
+        function triggerMascotsInteract() {
+            const boni = document.getElementById('boniMascot');
+            const popon = document.getElementById('poponMascot');
 
-            if (total === 0) {
-                recommendationEl.innerText = "Mari mulai mencatat pengeluaran Anda agar asisten AI Boni bisa memetakan kesehatan keuangan Anda!";
-                return;
-            }
-
-            const opRatio = operasional / total;
-            const invRatio = investasi / total;
-            const asetRatio = aset / total;
-
-            if (opRatio > 0.6) {
-                recommendationEl.innerHTML = `"Aduh bos! Porsi <span class='text-amber-400 font-bold'>Operasional</span> kamu tinggi banget nih mencapai ${(opRatio * 100).toFixed(0)}% dari total pengeluaran. Coba dipilah lagi mana yang prioritas mana yang kepengenan."`;
-            } else if (invRatio < 0.15) {
-                recommendationEl.innerHTML = `"Boni perhatiin tabungan <span class='text-violet-400 font-bold'>Investasi</span> kamu masih tipis nih. Yuk sisihkan minimal 15% setiap dapet pemasukan biar masa depan cerah benderang!"`;
-            } else if (asetRatio > 0.4) {
-                recommendationEl.innerHTML = `"Luar biasa, bos! Alokasi pembentukan <span class='text-emerald-400 font-bold'>Aset</span> kamu sangat sehat dan kokoh. Ini adalah pertanda pondasi kemakmuran finansial."`;
-            } else {
-                recommendationEl.innerHTML = `"Komposisi keuangan kamu seimbang banget nih bos! Jaga terus konsistensi ini untuk mencapai kebebasan finansial jangka panjang!"`;
-            }
-        }
-
-        // Character "Boni" (The piggy/coin SVG) interaction logic
-        function triggerMascotJump() {
-            const mascot = document.getElementById('boniMascot');
-            mascot.classList.remove('mascot-idle');
-            mascot.classList.add('mascot-jump');
+            boni.classList.remove('mascot-idle');
+            boni.classList.add('mascot-jump');
             
-            // Revert back to idle after animation finishes
+            popon.classList.remove('fox-idle');
+            popon.classList.add('mascot-jump');
+
             setTimeout(() => {
-                mascot.classList.remove('mascot-jump');
-                mascot.classList.add('mascot-idle');
+                boni.classList.remove('mascot-jump');
+                boni.classList.add('mascot-idle');
+
+                popon.classList.remove('mascot-jump');
+                popon.classList.add('fox-idle');
             }, 800);
         }
 
-        // Sad wiggle when delete happens
-        function triggerMascotWiggle() {
-            const mascot = document.getElementById('boniMascot');
-            mascot.classList.add('shake-effect');
+        function triggerMascotsSadWiggle() {
+            const boni = document.getElementById('boniMascot');
+            const popon = document.getElementById('poponMascot');
+
+            boni.classList.add('shake-effect');
+            popon.classList.add('shake-effect');
+
             setTimeout(() => {
-                mascot.classList.remove('shake-effect');
+                boni.classList.remove('shake-effect');
+                popon.classList.remove('shake-effect');
             }, 300);
         }
 
-        function mascotJumpAndSpeak() {
-            triggerMascotJump();
+        // Mascot Speeches Click Actions (Triggers playCuteSound accordingly!)
+        function clickBoni() {
+            // Bling! sound for Boni
+            playCuteSound('boni');
+            triggerMascotsInteract();
             
-            // Randomly select a tip/quote for Boni to say
-            const randomIndex = Math.floor(Math.random() * mascotQuotes.length);
-            document.getElementById('boniSpeech').innerText = `"${mascotQuotes[randomIndex]}"`;
+            const playground = document.getElementById('mascotPlayground');
+            const isBad = playground.classList.contains('health-bad');
+
+            const sourcePool = isBad ? badConversations.filter(c => c.sender === 'boni') : conversations.filter(c => c.sender === 'boni');
+            const randomQuote = sourcePool[Math.floor(Math.random() * sourcePool.length)];
+            
+            document.getElementById('speakerLabel').innerText = "Boni:";
+            document.getElementById('speakerLabel').className = "text-indigo-400 font-bold";
+            document.getElementById('dialogueText').innerText = `"${randomQuote.text.replace(/^[Bb]oni:\s*"?/, '').replace(/"$/, '')}"`;
         }
 
-        // Custom elegant notification popup
+        function clickPopon() {
+            // Yap! sound for Popon
+            playCuteSound('popon');
+            triggerMascotsInteract();
+            
+            const playground = document.getElementById('mascotPlayground');
+            const isBad = playground.classList.contains('health-bad');
+
+            const sourcePool = isBad ? badConversations.filter(c => c.sender === 'popon') : conversations.filter(c => c.sender === 'popon');
+            const randomQuote = sourcePool[Math.floor(Math.random() * sourcePool.length)];
+            
+            document.getElementById('speakerLabel').innerText = "Popon:";
+            document.getElementById('speakerLabel').className = "text-orange-400 font-bold";
+            document.getElementById('dialogueText').innerText = `"${randomQuote.text.replace(/^[Pp]opon:\s*"?/, '').replace(/"$/, '')}"`;
+        }
+
+        // Custom alert toast system
         function showToast(title, message, type = "success") {
             const toast = document.getElementById('toastNotification');
             const titleEl = document.getElementById('toastTitle');
@@ -1260,7 +1499,6 @@ function doPost(e) {
             titleEl.innerText = title;
             messageEl.innerText = message;
 
-            // Change color scheme based on notification type
             if (type === "success") {
                 iconContainer.className = "p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg";
                 iconContainer.innerHTML = `
@@ -1277,11 +1515,9 @@ function doPost(e) {
                 `;
             }
 
-            // Slide in animation
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
 
-            // Slide out after 3.5 seconds
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
