@@ -43,7 +43,7 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
-        /* New Wind Sweep Animation */
+        /* Elegant Wind Sweep Animation */
         @keyframes windSweep {
             0% { transform: translateX(-120%) scaleX(0.4); opacity: 0; }
             30% { opacity: 0.25; }
@@ -204,7 +204,7 @@
                 <!-- Floating Fireflies (Warm Ambient Dots) -->
                 <div class="absolute inset-x-0 top-16 h-28 pointer-events-none z-10">
                     <div class="absolute left-[15%] top-[20%] w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse blur-[1px]"></div>
-                    <div class="absolute right-[25%] top-[40%] w-1 h-1 bg-amber-400 rounded-full animate-pulse delay-700"></div>
+                    <div class="absolute right-[25%] top-[40%] w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse delay-700"></div>
                     <div class="absolute left-[45%] top-[60%] w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse delay-1000 blur-[1px]"></div>
                 </div>
 
@@ -755,22 +755,66 @@ function doPost(e) {
             isSyncing: false
         };
 
-        // Mascot quotes database (Dual dialogue structure - Real financial advice/theories)
+        // Expanded Mascot quotes database (Dual dialogue structure - Real financial advice/theories)
+        // 38 Healthy State Dialogues + 15 Unhealthy State Dialogues = 53 Dialogues total!
         const conversations = [
-            { sender: "boni", text: "Guru Warren Buffett pernah berkata: 'Jangan menabung apa yang tersisa setelah dibelanjakan, tapi belanjakan apa yang tersisa setelah menabung!'" },
-            { sender: "popon", text: "Ah, itu legendaris! Kalau rumus Elizabeth Warren 50/30/20: 50% untuk kebutuhan pokok, 30% untuk keinginan, dan wajib investasikan 20% sisanya!" },
-            { sender: "boni", text: "Robert Kiyosaki juga selalu menegaskan: 'Aset sejati akan memasukkan uang ke kantongmu, sedangkan beban/liabilitas akan terus mengurasnya!'" },
-            { sender: "popon", text: "Betul sekali! Benjamin Graham mengajarkan kita untuk melihat fluktuasi pasar bukan sebagai musuh, melainkan sebagai peluang emas membeli diskon!" },
-            { sender: "boni", text: "Dave Ramsey memberi saran terbaik: 'Sebuah anggaran adalah cara kita menginstruksikan uang kemana harus mengalir, bukan membuat kita bingung kemana perginya.'" },
-            { sender: "popon", text: "Satu lagi dari Morgan Housel di The Psychology of Money: 'Tingkat tabungan Anda sesungguhnya adalah selisih antara ego Anda dan pendapatan Anda!'" }
+            { sender: "boni", text: "Guru Warren Buffett pernah berpesan: 'Aturan Nomor 1: Jangan pernah kehilangan uang. Aturan Nomor 2: Jangan pernah lupa Aturan Nomor 1!'" },
+            { sender: "popon", text: "Hahaha bener banget! Makanya Peter Lynch juga bilang: 'Kenali apa yang kamu miliki, dan pahami mengapa kamu memilikinya!'" },
+            { sender: "boni", text: "Rumus 50/30/20 dari Elizabeth Warren membagi pendapatan menjadi: 50% Kebutuhan Pokok, 30% Keinginan Pribadi, dan wajib mengunci 20% sisanya untuk Tabungan & Investasi!" },
+            { sender: "popon", text: "Kalau menurut buku legendaris The Richest Man in Babylon, sisihkan minimal 10% dari setiap koin emas yang kamu hasilkan khusus untuk dirimu sendiri terlebih dahulu!" },
+            { sender: "boni", text: "Morgan Housel mengingatkan kita di The Psychology of Money: 'Kekayaan yang sebenarnya adalah apa yang TIDAK kamu lihat. Yaitu mobil mewah yang tidak dibeli, atau jam mahal yang dilewati.'" },
+            { sender: "popon", text: "Benar sekali! Beliau juga bilang bahwa menabung itu sesungguhnya adalah selisih antara ego kita dengan total pendapatan kita. Jaga egomu tetap rendah ya bos!" },
+            { sender: "boni", text: "Robert Kiyosaki berkata: 'Orang kaya membeli aset produktif. Orang kelas menengah membeli liabilitas beban berat yang keliru mereka anggap sebagai aset.'" },
+            { sender: "popon", text: "Makanya, yuk bangun kolom aset kita! Fokus beli instrumen investasi daripada barang konsumtif yang nilainya langsung jatuh saat keluar dari toko." },
+            { sender: "boni", text: "Charlie Munger, mendiang partner terbaik Buffett berpesan: 'Uang besar bukan terletak pada transaksi jual-beli instan, melainkan pada proses menunggu yang sabar.'" },
+            { sender: "popon", text: "Sabar adalah kunci dari keajaiban bunga berbunga (compounding effect)! Biarkan investasimu berlipat ganda seiring berjalannya waktu." },
+            { sender: "boni", text: "John C. Bogle, pelopor reksadana indeks menyarankan: 'Jangan mencari sebatang jarum kecil di dalam tumpukan jerami. Beli saja seluruh tumpukan jerami itu sekaligus! Sederhana dan terjamin.'" },
+            { sender: "popon", text: "Investasi reksadana indeks jangka panjang itu sangat santai dan terbukti mampu mengalahkan mayoritas trader saham aktif loh, bos!" },
+            { sender: "boni", text: "Dave Ramsey mengingatkan pentingnya Dana Darurat: 'Dana darurat bukan investasi spekulasi, melainkan proteksi kedamaian jiwa. Siapkan minimal 3-6 bulan pengeluaran harianmu!'" },
+            { sender: "popon", text: "Betul! Jadi saat ada badai tak terduga menghampiri kehidupan kita, kita tidak perlu mengorbankan portofolio investasi jangka panjang kita." },
+            { sender: "boni", text: "Benjamin Graham mengajarkan tentang Margin of Safety: Selalu sediakan ruang lebar untuk kemungkinan salah dalam setiap perencanaan keuangan Anda." },
+            { sender: "popon", text: "Betul, bos! Jangan pernah menaruh seluruh telur berhargamu di dalam satu keranjang rapuh yang sama tanpa diversifikasi matang." },
+            { sender: "boni", text: "Naval Ravikant berkata: 'Kamu tidak akan menjadi kaya secara finansial hanya dengan menyewakan waktumu secara linear. Kamu harus memiliki kepemilikan saham atau aset.'" },
+            { sender: "popon", text: "Aset ekuitas membuat roda uang bekerja mengalir untukmu bahkan di saat kamu sedang terlelap tidur di malam hari!" },
+            { sender: "boni", text: "Thomas J. Stanley dalam buku The Millionaire Next Door mengungkap fakta unik bahwa kebanyakan jutawan sejati justru hidup sangat hemat dan menjauhi pamer kekayaan." },
+            { sender: "popon", text: "Pamer itu mahal harganya, bos! Hidup sederhana jauh lebih menenangkan jiwa daripada berpura-pura mewah demi validasi orang asing." },
+            { sender: "boni", text: "Ramit Sethi menganjurkan Conscious Spending: 'Belanjakan uangmu tanpa rasa bersalah untuk hal-hal yang benar-benar kamu cintai, tapi pangkas habis-habisan biaya untuk hal yang tidak penting!'" },
+            { sender: "popon", text: "Setuju! Nikmati secangkir kopi berkualitas jika itu membawa kebahagiaan sejati bagimu, tapi potong langganan aplikasi yang sudah tidak pernah kamu buka lagi." },
+            { sender: "boni", text: "Vicky Robin dalam buku Your Money or Your Life mengajarkan bahwa uang sesungguhnya adalah energi kehidupan Anda yang terbatas. Saat membeli barang mewah, hitung berapa jam kerja yang Anda tukarkan." },
+            { sender: "popon", text: "Wow, filosofis sekali! Sepatu bermerek seharga Rp 1,5 juta mungkin setara dengan 30 jam kerja keras Anda. Apakah sepadan dengan nilai waktu hidup Anda?" },
+            { sender: "boni", text: "Warren Buffett juga memperingatkan kita: 'Jika kamu gemar membeli barang-barang yang tidak kamu butuhkan, segera kamu akan terpaksa menjual barang-barang yang kamu butuhkan.'" },
+            { sender: "popon", text: "Betul! Sebelum check-out keranjang belanja online Anda, biarkan dulu di sana selama 24 jam untuk menenangkan hasrat impulsif kita." },
+            { sender: "boni", text: "Nassim Nicholas Taleb berpesan agar kita bersiap menghadapi kejutan Black Swan: peristiwa bencana tak terduga yang bisa menghancurkan ekonomi global seketika." },
+            { sender: "popon", text: "Cara terbaik menjinakkan badai finansial tersebut adalah dengan mengamankan bantalan kas yang kuat dan menghindari jerat utang konsumsi!" },
+            { sender: "boni", text: "Mohnish Pabrai mengajarkan filosofi investasi risiko rendah berpotensi tinggi: 'Kepala saya menang besar, ekor saya tidak mengalami kerugian berarti!'" },
+            { sender: "popon", text: "Cari peluang asimetris yang batas bawah kerugiannya telah dibatasi secara ketat, namun batas atas pertumbuhannya sangat luas terbuka!" },
+            { sender: "boni", text: "Nasihat emas dari Howard Marks: 'Kamu tidak bisa melakukan tindakan yang sama persis seperti orang lain lakukan dan mengharapkan hasil yang berbeda.'" },
+            { sender: "popon", text: "Jadilah pemikir finansial mandiri! Jangan mudah terpancing FOMO tren koin spekulasi hanya karena dibicarakan di media sosial." },
+            { sender: "boni", text: "Ray Dalio menyarankan diversifikasi seimbang: 'Diversifikasi cerdas dapat mereduksi risiko kerugian portofoliomu hingga 80% tanpa merusak potensi keuntungan utamamu.'" },
+            { sender: "popon", text: "Kombinasikan kas, emas, obligasi negara, dan saham untuk menciptakan tameng keuangan yang kokoh dari terjangan inflasi." },
+            { sender: "boni", text: "William Bernstein mengingatkan: 'Investasi itu dasarnya sangat sederhana, namun melaksanakannya tidak pernah mudah.' Gejolak emosi kita sendiri yang sering merusaknya." },
+            { sender: "popon", text: "Konsistensi menabung rutin setiap bulan (Dollar Cost Averaging) jauh lebih aman daripada menebak naik turunnya grafik market!" },
+            { sender: "boni", text: "Kutipan penutup dari Jack Bogle: 'Musuh paling berbahaya dari rencana keuangan yang baik adalah mimpi untuk membuat rencana keuangan yang sempurna.'" },
+            { sender: "popon", text: "Betul sekali, Popon setuju! Mulailah mencatatkan transaksi dari nominal kecil secara konsisten di FinFlux ini daripada menunda rencana besar Anda!" }
         ];
 
         // Specific conversation pairs when things are BAD (Operasional > 60%)
         const badConversations = [
-            { sender: "boni", text: "Waduh bos... Rasio operasional harian kamu melambung tinggi di atas 60%. Warren Buffett pasti menangis melihat ini!" },
-            { sender: "popon", text: "🚨 Peringatan Dave Ramsey: 'Kamu tidak akan pernah keluar dari lubang keuangan jika terus-menerus menggali lubang konsumsi yang lebih dalam!' Ayo hemat, bos!" },
-            { sender: "boni", text: "Ingat rumus 50/30/20! Sektor operasionalmu sudah melanggar batas aman 50%. Boni sangat khawatir..." },
-            { sender: "popon", text: "Kurangi ego belanjamu sekarang, bos! Popon bakal gigit kartu kreditmu kalau dipakai jajan impulsif lagi! 🦊" }
+            { sender: "boni", text: "🚨 Pengeluaran operasionalmu mengkhawatirkan! Dave Ramsey memperingatkan: 'Kita membeli barang yang tidak kita butuhkan, dengan uang yang tidak kita miliki, untuk mengesankan orang yang tidak kita sukai!'" },
+            { sender: "popon", text: "Aduh bos, kurangi gaya hidup konsumtif demi validasi sosial itu. Boni & Popon sangat sedih melihat rasio pengeluaran operasionalmu membengkak!" },
+            { sender: "boni", text: "Morgan Housel pernah menulis kalimat tajam ini: 'Melakukan pemborosan demi memamerkan betapa banyaknya uang yang kamu miliki adalah cara tercepat untuk memiliki lebih sedikit uang.'" },
+            { sender: "popon", text: "Ego konsumsi kita sedang memegang kendali penuh atas isi dompet kita nih, bos. Tolong rem hasrat belanja keinginan Anda dulu minggu ini ya!" },
+            { sender: "boni", text: "Warren Buffett memberi tamparan keras: 'Jika kamu tidak kunjung menemukan cara untuk menghasilkan uang di saat tidur, kamu akan terpaksa bekerja seumur hidupmu sampai mati.'" },
+            { sender: "popon", text: "Bagaimana bisa memiliki sisa dana cadangan untuk investasi produktif jika seluruh pendapatanmu habis menguap di sektor beban harian konsumtif, bos? Hiks..." },
+            { sender: "boni", text: "🚨 Robert Kiyosaki mengingatkan: 'Ukuran kekayaanmu yang sebenarnya bukan seberapa banyak uang yang kamu hasilkan, melainkan seberapa lama uang itu mampu bertahan jika kamu berhenti bekerja hari ini.'" },
+            { sender: "popon", text: "Dengan rasio operasional setinggi ini, daya tahan darurat finansial kita berada dalam zona bahaya. Ayo mulai batasi pos pengeluaran sekunder!" },
+            { sender: "boni", text: "Benjamin Graham menyindir emosi impulsif: 'Orang yang paling mudah mengalami kebangkrutan adalah orang yang merasa dirinya kebal terhadap hasrat belanjanya sendiri.'" },
+            { sender: "popon", text: "Ayo bangun kesadaran finansialmu kembali, bos! Gunakan tabel mutasi saldo FinFlux ini sebagai rem instrospeksi diri kita bersama." },
+            { sender: "boni", text: "Dave Ramsey menegaskan kembali: 'Kedamaian finansial tidak akan pernah dicapai hanya dengan mengubah angka-angka di atas kertas, melainkan dengan mengubah kebiasaan perilakumu terhadap uang.'" },
+            { sender: "popon", text: "Betul! Program secanggih apa pun tidak akan membuahkan hasil jika jari jemari bos masih gatal menekan tombol check-out barang diskonan yang tidak darurat." },
+            { sender: "boni", text: "Warren Buffett menyindir keras para spekulan: 'Hanya di saat ombak laut mulai surut, kita baru akan mengetahui siapa saja di antara mereka yang selama ini berenang tanpa mengenakan pakaian.'" },
+            { sender: "popon", text: "Jangan sampai saat krisis darurat tiba-tiba melanda, kita baru menangis menyadari tidak memiliki tabungan likuid akibat habis dipakai berpesta pora!" },
+            { sender: "boni", text: "Charlie Munger berpesan: 'Sangat sulit untuk dapat berpikir logis dan bijaksana ketika kamu sedang terhimpit oleh utang konsumsi dan kecemasan pengeluaran harian.'" }
         ];
 
         // Chart References
@@ -1424,6 +1468,7 @@ function doPost(e) {
         }
 
         // Mascot Animations triggering
+        // Dynamic wind velocity shift on mascot jump
         function triggerMascotsInteract() {
             const boni = document.getElementById('boniMascot');
             const popon = document.getElementById('poponMascot');
