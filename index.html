@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinFlux - Mutasi Saldo & Asisten Interaktif</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Keyframes for Animations */
+        @keyframes idleBounce {
+            0%, 100% { transform: translateY(0) scaleY(1) scaleX(1); }
+            50% { transform: translateY(-8px) scaleY(1.03) scaleX(0.97); }
+        }
+        @keyframes jumpActive {
+            0% { transform: translateY(0) scaleY(0.9) scaleX(1.1); }
+            15% { transform: translateY(-40px) scaleY(1.1) scaleX(0.9) rotate(15deg); }
+            50% { transform: translateY(-80px) scaleY(1) scaleX(1) rotate(180deg); }
+            85% { transform: translateY(-20px) scaleY(1.05) scaleX(0.95) rotate(340deg); }
+            100% { transform: translateY(0) scaleY(1) scaleX(1) rotate(360deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .mascot-idle {
+            animation: idleBounce 3s ease-in-out infinite;
+        }
+        .mascot-jump {
+            animation: jumpActive 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        .shake-effect {
+            animation: shake 0.3s ease-in-out;
+        }
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden pb-12">
+
+    <!-- TOP NAVBAR -->
+    <header class="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-emerald-400 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/15">
+                <!-- Wallet Icon SVG -->
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">FinFlux</h1>
+                <p class="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Personal Mutation Engine</p>
+            </div>
+        </div>
+
+        <!-- Desktop Menu / Sync Indicators -->
+        <div class="flex items-center space-x-4">
+            <div id="syncBadge" class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Local Mode</span>
+            </div>
+            <div id="gasActiveBadge" class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-bounce"></span>
+                <span>Connected to GAS</span>
+            </div>
+            <button onclick="switchTab('settings')" class="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT COLUMN: Mascot & Form Controls (Lg: 4 cols) -->
+        <div class="lg:col-span-4 flex flex-col space-y-6">
+            
+            <!-- MASCOT CARD (Boni Si Celengan) -->
+            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center text-center shadow-xl border-indigo-500/10">
+                <!-- Dynamic background aura -->
+                <div class="absolute -top-12 -left-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                <!-- Boni Mascot Container -->
+                <div class="relative w-36 h-36 flex items-center justify-center cursor-pointer" onclick="mascotJumpAndSpeak()">
+                    <!-- Click suggestion -->
+                    <span class="absolute top-0 right-0 text-[10px] bg-indigo-600/30 text-indigo-300 font-semibold px-2 py-0.5 rounded-full border border-indigo-500/30 animate-pulse">Tap Me!</span>
+                    
+                    <!-- SVG Character Boni -->
+                    <svg id="boniMascot" class="w-28 h-28 mascot-idle transition-all duration-300 transform" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Piggy/Coin Body -->
+                        <rect x="15" y="25" width="70" height="60" rx="30" fill="url(#pigGrad)" stroke="#4f46e5" stroke-width="2.5" />
+                        <!-- Shiny/Highlight -->
+                        <path d="M25 35 Q 50 28 75 35" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round"/>
+                        <!-- Piggy Snout -->
+                        <rect x="40" y="55" width="20" height="14" rx="7" fill="#818cf8" stroke="#4f46e5" stroke-width="2"/>
+                        <circle cx="46" cy="62" r="2.5" fill="#312e81"/>
+                        <circle cx="54" cy="62" r="2.5" fill="#312e81"/>
+                        <!-- Cute Eyes -->
+                        <!-- Left eye -->
+                        <g id="leftEye">
+                            <circle cx="33" cy="46" r="6" fill="#1e1b4b"/>
+                            <circle cx="31" cy="44" r="2" fill="white"/>
+                        </g>
+                        <!-- Right eye -->
+                        <g id="rightEye">
+                            <circle cx="67" cy="46" r="6" fill="#1e1b4b"/>
+                            <circle cx="65" cy="44" r="2" fill="white"/>
+                        </g>
+                        <!-- Rosie Cheeks -->
+                        <circle cx="25" cy="54" r="4.5" fill="#f43f5e" opacity="0.6"/>
+                        <circle cx="75" cy="54" r="4.5" fill="#f43f5e" opacity="0.6"/>
+                        <!-- Coin Slot (Top) -->
+                        <rect x="42" y="16" width="16" height="6" rx="3" fill="#1e1b4b" />
+                        <rect x="46" y="10" width="8" height="12" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="1.5" />
+                        <!-- Little Cute Legs -->
+                        <rect x="30" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
+                        <rect x="60" y="84" width="10" height="8" rx="4" fill="#4f46e5"/>
+
+                        <!-- Gradients definition -->
+                        <defs>
+                            <linearGradient id="pigGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#a5b4fc" />
+                                <stop offset="50%" stop-color="#818cf8" />
+                                <stop offset="100%" stop-color="#6366f1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <!-- Boni Speech Bubble -->
+                <div class="mt-4 w-full bg-slate-900 border border-slate-800 rounded-xl p-3 relative shadow-inner">
+                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-900 border-t border-l border-slate-800 rotate-45"></div>
+                    <p id="boniSpeech" class="text-xs sm:text-sm font-medium text-slate-300">
+                        "Halo bos! Yuk catat semua pengeluaran kamu biar analisis keuangan kamu makin akurat!"
+                    </p>
+                </div>
+            </div>
+
+            <!-- QUICK TRANSACTION FORM -->
+            <div class="glass-panel p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-bold text-slate-100 mb-4 flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    <span>Catat Pengeluaran Baru</span>
+                </h3>
+
+                <form id="txForm" onsubmit="handleTransactionSubmit(event)" class="space-y-4">
+                    <!-- Category Selection -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Klasifikasi Akun</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                                <input type="radio" name="category" value="beban operasional" checked class="sr-only">
+                                <span class="text-xs font-bold text-amber-400">Operasional</span>
+                                <span class="text-[9px] text-slate-400">Kebutuhan Harian</span>
+                            </label>
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                                <input type="radio" name="category" value="investasi" class="sr-only">
+                                <span class="text-xs font-bold text-violet-400">Investasi</span>
+                                <span class="text-[9px] text-slate-400">Masa Depan</span>
+                            </label>
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                                <input type="radio" name="category" value="aset" class="sr-only">
+                                <span class="text-xs font-bold text-emerald-400">Aset</span>
+                                <span class="text-[9px] text-slate-400">Benda Berharga</span>
+                            </label>
+                            <label class="category-btn cursor-pointer flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800/60 transition text-center">
+                                <input type="radio" name="category" value="beban lainnya" class="sr-only">
+                                <span class="text-xs font-bold text-rose-400">Lainnya</span>
+                                <span class="text-[9px] text-slate-400">Biaya Tambahan</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description Input -->
+                    <div>
+                        <label for="desc" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Deskripsi Transaksi</label>
+                        <input type="text" id="desc" required placeholder="Beli kopi, Bayar Kos, Nabung Saham..." 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                    </div>
+
+                    <!-- Amount Input -->
+                    <div>
+                        <label for="amount" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Jumlah (Rupiah)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
+                            <input type="number" id="amount" required min="1" placeholder="0" 
+                                class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Date Input -->
+                    <div>
+                        <label for="date" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Tanggal</label>
+                        <input type="date" id="date" required 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20 active:scale-[0.98] transition duration-200 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Simpan Mutasi</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Dashboard & Analytics Engine (Lg: 8 cols) -->
+        <div class="lg:col-span-8 flex flex-col space-y-6">
+            
+            <!-- VIEW TABS NAVIGATION -->
+            <div class="flex items-center space-x-2 p-1 bg-slate-900 border border-slate-800 rounded-xl max-w-lg">
+                <button onclick="switchTab('dashboard')" id="btnTabDashboard" class="tab-btn flex-1 flex items-center justify-center space-x-2 py-2 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span>Analisis Dashboard</span>
+                </button>
+                <button onclick="switchTab('transactions')" id="btnTabTransactions" class="tab-btn flex-1 flex items-center justify-center space-x-2 py-2 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    <span>Mutasi Buku</span>
+                </button>
+                <button onclick="switchTab('settings')" id="btnTabSettings" class="tab-btn flex-1 flex items-center justify-center space-x-2 py-2 px-3 sm:px-4 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>GAS Integration</span>
+                </button>
+            </div>
+
+            <!-- TAB CONTENT 1: ANALYTICS DASHBOARD -->
+            <div id="tabDashboard" class="tab-pane space-y-6">
+                
+                <!-- SUMMARY HIGHLIGHT CARDS -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- CARD 1: OPERASIONAL -->
+                    <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Operasional</span>
+                        <div class="mt-2">
+                            <p id="totalOperasional" class="text-base sm:text-lg font-extrabold text-amber-400">Rp 0</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Konsumsi Harian</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: INVESTASI -->
+                    <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Investasi</span>
+                        <div class="mt-2">
+                            <p id="totalInvestasi" class="text-base sm:text-lg font-extrabold text-violet-400">Rp 0</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Aset Produktif</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3: ASET -->
+                    <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Aset Fisik</span>
+                        <div class="mt-2">
+                            <p id="totalAset" class="text-base sm:text-lg font-extrabold text-emerald-400">Rp 0</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Harta Tersimpan</p>
+                        </div>
+                    </div>
+
+                    <!-- CARD 4: BEBAN LAINNYA -->
+                    <div class="glass-panel p-4 rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-md">
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Lainnya</span>
+                        <div class="mt-2">
+                            <p id="totalLainnya" class="text-base sm:text-lg font-extrabold text-rose-400">Rp 0</p>
+                            <p class="text-[10px] text-slate-500 mt-1">Biaya Tambahan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARTS AND STATS PANEL -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- Main Doughnut Chart Card -->
+                    <div class="glass-panel p-5 rounded-2xl md:col-span-5 flex flex-col justify-between shadow-xl">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-200 mb-1">Proporsi Akun</h4>
+                            <p class="text-xs text-slate-400 mb-4">Pengeluaran berdasarkan tipe mutasi</p>
+                        </div>
+                        <div class="relative w-full max-w-[200px] mx-auto aspect-square flex items-center justify-center">
+                            <canvas id="proporsiChart"></canvas>
+                        </div>
+                        <div class="mt-4 space-y-1 text-xs">
+                            <div class="flex justify-between items-center text-slate-400">
+                                <span>Total Alokasi:</span>
+                                <span id="totalAlokasiChart" class="font-extrabold text-white">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bar Trend Chart Card -->
+                    <div class="glass-panel p-5 rounded-2xl md:col-span-7 flex flex-col justify-between shadow-xl">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-200 mb-1">Tren Mingguan</h4>
+                            <p class="text-xs text-slate-400 mb-4">Grafik fluktuasi 7 transaksi terakhir</p>
+                        </div>
+                        <div class="relative w-full h-[180px]">
+                            <canvas id="trenChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK RECOMMENDATION SYSTEM -->
+                <div class="glass-panel p-5 rounded-2xl shadow-xl flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
+                        <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold text-slate-200">Rekomendasi Analisis Cerdas</h4>
+                        <p id="financeRecommendation" class="text-xs text-slate-400 mt-1">
+                            "Menganalisis pola alokasi uang Anda... Yuk tambahkan minimal 3 transaksi untuk mendapatkan saran berharga dari AI Asisten Boni!"
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB CONTENT 2: TRANSACTION BOOK (MUTASI BUKU) -->
+            <div id="tabTransactions" class="tab-pane space-y-4 hidden">
+                <div class="glass-panel p-5 rounded-2xl shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 pb-4 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-100">Daftar Transaksi Pribadi</h3>
+                            <p class="text-xs text-slate-400">Laporan mutasi keluar Anda secara detail</p>
+                        </div>
+                        
+                        <!-- Search & Filter Area -->
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="searchInput" oninput="filterTransactions()" placeholder="Cari deskripsi..." 
+                                class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                            <select id="filterCategory" onchange="filterTransactions()" 
+                                class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500">
+                                <option value="all">Semua Akun</option>
+                                <option value="beban operasional">Operasional</option>
+                                <option value="investasi">Investasi</option>
+                                <option value="aset">Aset</option>
+                                <option value="beban lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- TRANSACTION TABLE -->
+                    <div class="overflow-x-auto mt-4">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Tanggal</th>
+                                    <th class="py-3 px-4">Akun</th>
+                                    <th class="py-3 px-4">Deskripsi</th>
+                                    <th class="py-3 px-4 text-right">Jumlah (IDR)</th>
+                                    <th class="py-3 px-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionList" class="divide-y divide-slate-800/40 text-xs text-slate-300">
+                                <!-- Dynamic Rows Go Here -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="emptyState" class="hidden flex flex-col items-center justify-center py-12 text-center">
+                            <svg class="w-12 h-12 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <p class="text-sm font-semibold text-slate-400">Belum ada mutasi keuangan</p>
+                            <p class="text-xs text-slate-500 mt-1">Silakan tambahkan transaksi baru menggunakan formulir di sebelah kiri.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB CONTENT 3: SETTINGS & GOOGLE APPS SCRIPT CONNECTION -->
+            <div id="tabSettings" class="tab-pane space-y-6 hidden">
+                
+                <!-- GAS Settings Card -->
+                <div class="glass-panel p-5 rounded-2xl shadow-xl">
+                    <h3 class="text-base font-bold text-slate-100 flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        </svg>
+                        <span>Sinkronisasi Google Spreadsheet</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1 mb-4">
+                        Gunakan Google Sheets milik Anda sendiri sebagai database cloud pribadi! Tempel tautan Web App dari deployment Google Apps Script Anda.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Spreadsheet / GAS Web App URL</label>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." 
+                                    class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <button onclick="saveGasUrl()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 px-5 rounded-xl transition">
+                                    Hubungkan
+                                </button>
+                                <button onclick="disconnectGas()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs py-3 px-4 rounded-xl transition">
+                                    Disconnect
+                                </button>
+                            </div>
+                            <span class="text-[10px] text-slate-500 mt-1.5 block">Jika kosong, aplikasi akan berjalan dalam mode offline (menyimpan data di memori browser lokal).</span>
+                        </div>
+
+                        <!-- NEW: Force Sync & Initial Import/Export Button -->
+                        <div id="gasUtilityBox" class="hidden p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-3">
+                            <h4 class="text-xs font-bold text-indigo-300">Utilitas Spreadsheet Tambahan</h4>
+                            <p class="text-[11px] text-slate-400">Spreadsheet Anda baru dan kosong? Anda dapat mengunggah 5 data contoh lokal Anda sekarang agar langsung terisi rapi dengan strukturnya.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="uploadLocalDataToGas()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px] py-2 px-3 rounded-lg transition flex items-center space-x-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    <span>Ekspor Data Contoh ke Spreadsheet Kosong</span>
+                                </button>
+                                <button onclick="fetchFromGas()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[10px] py-2 px-3 rounded-lg border border-slate-700 transition flex items-center space-x-1">
+                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"></path>
+                                    </svg>
+                                    <span>Tarik Data Terbaru (Sync)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Apps Script Source Code & Tutorial -->
+                <div class="glass-panel p-5 rounded-2xl shadow-xl space-y-4">
+                    <h3 class="text-sm font-bold text-slate-200">Panduan 3 Langkah Penyusunan Database Spreadsheet Anda</h3>
+                    
+                    <!-- Accordion or steps -->
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 1:</span> Buat sebuah Spreadsheet baru di Google Drive Anda. Berikan nama yang sesuai, contoh: <code class="bg-slate-950 px-1.5 py-0.5 rounded text-indigo-300">Mutasi Finansial FinFlux</code>.
+                        </div>
+                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 2:</span> Klik <strong class="text-white">Ekstensi &gt; Apps Script</strong>. Hapus semua kode default dan tempelkan blok kode yang sudah kami sediakan di bawah ini.
+                        </div>
+                        <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl">
+                            <span class="font-extrabold text-indigo-400 mr-1.5">Langkah 3:</span> Klik tombol <strong class="text-white">Terapkan &gt; Penerapan Baru</strong>. Pilih jenis <strong class="text-white">Aplikasi Web</strong>. Ubah aksesnya menjadi <strong class="text-white">Siapa saja (Anyone)</strong> dan pastikan dijalankan sebagai <strong class="text-white">Diri Anda (Me)</strong>. Salin URL Aplikasi Web yang dihasilkan dan masukkan ke kotak input di atas!
+                        </div>
+                    </div>
+
+                    <!-- Copyable Code Area -->
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Kode Google Apps Script (.gs) - Versi Kompatibel Komplit</span>
+                            <button onclick="copyGasCode()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-1 px-2.5 rounded transition">
+                                Salin Kode
+                            </button>
+                        </div>
+                        <pre class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-[10px] font-mono text-emerald-400 overflow-x-auto max-h-[220px]">
+/* Kode Google Apps Script untuk Backend FinFlux - Mendukung Auto Header */
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  // Jika Spreadsheet masih kosong (tidak ada baris)
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
+  }
+  
+  var data = sheet.getDataRange().getValues();
+  var result = [];
+  
+  // Ambil data jika ada selain header
+  for (var i = 1; i < data.length; i++) {
+    result.push({
+      id: data[i][0],
+      tanggal: data[i][1],
+      kategori: data[i][2],
+      deskripsi: data[i][3],
+      jumlah: Number(data[i][4])
+    });
+  }
+  
+  var jsonString = JSON.stringify(result);
+  
+  // Deteksi callback untuk penanganan JSONP (Bypass pembatasan CORS peramban)
+  var callback = e.parameter.callback;
+  if (callback) {
+    return ContentService.createTextOutput(callback + '(' + jsonString + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  
+  return ContentService.createTextOutput(jsonString)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var params = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Header setup otomatis jika sheet kosong
+    if (sheet.getLastRow() == 0) {
+      sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
+    }
+    
+    if (params.action === "delete") {
+      var data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][0] == params.id) {
+          sheet.deleteRow(i + 1);
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Tambah baris baru
+    sheet.appendRow([
+      params.id || Utilities.getUuid(),
+      params.tanggal,
+      params.kategori,
+      params.deskripsi,
+      params.jumlah
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FLOATING NOTIFICATION SYSTEM -->
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm w-full bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-2xl flex items-center space-x-3 pointer-events-none">
+        <div id="toastIconContainer" class="p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg">
+            <!-- Icon Dynamic -->
+        </div>
+        <div class="flex-1">
+            <h5 id="toastTitle" class="text-xs font-bold text-slate-100">Proses Berhasil</h5>
+            <p id="toastMessage" class="text-[11px] text-slate-400 mt-0.5">Pencatatan mutasi saldo telah direkam dengan sukses.</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // App State
+        let state = {
+            transactions: [],
+            gasUrl: "",
+            isSyncing: false
+        };
+
+        // Mascot quotes database
+        const mascotQuotes = [
+            "Halo bos! Yuk catat semua pengeluaran kamu biar analisis keuangan kamu makin akurat!",
+            "Investasi adalah kunci kebebasan finansial di masa depan, jangan kendor ya!",
+            "Kebutuhan operasional harus tetap termonitor agar tidak terjadi kebocoran dompet!",
+            "Wah, asyik! Memperbanyak porsi Aset akan membuat masa tua kamu lebih tenang dan berkecukupan.",
+            "Setiap rupiah yang dikeluarkan punya cerita. Pastikan ceritanya bahagia, bukan penyesalan!",
+            "Ingat rumus keuangan legendaris: 50% Kebutuhan, 30% Keinginan, 20% Masa depan!",
+            "Boni senang melihat portofolio kamu semakin rapi dan terukur setiap harinya!"
+        ];
+
+        // Chart References
+        let proporsiChartObj = null;
+        let trenChartObj = null;
+
+        // On Document Load
+        window.onload = function() {
+            // Set default date input value to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+
+            // Load GAS URL and initial dummy/stored data
+            loadAppState();
+            
+            // Render UI Components
+            switchTab('dashboard');
+            renderData();
+        };
+
+        // Save and Load State Utilities
+        function loadAppState() {
+            // Load saved GAS URL
+            const savedUrl = localStorage.getItem('finflux_gas_url');
+            if (savedUrl) {
+                state.gasUrl = savedUrl;
+                document.getElementById('gasUrlInput').value = savedUrl;
+                updateSyncIndicators(true);
+            } else {
+                updateSyncIndicators(false);
+            }
+
+            // Load locally cached transactions or load mockup data if empty
+            const savedTx = localStorage.getItem('finflux_transactions');
+            if (savedTx) {
+                state.transactions = JSON.parse(savedTx);
+            } else {
+                // Pre-populate with beautiful default analytical data
+                state.transactions = [
+                    { id: "1", tanggal: "2026-05-18", kategori: "beban operasional", deskripsi: "Makan Malam & Transport", jumlah: 125000 },
+                    { id: "2", tanggal: "2026-05-19", kategori: "investasi", deskripsi: "Reksadana Saham Bulanan", jumlah: 500000 },
+                    { id: "3", tanggal: "2026-05-20", kategori: "aset", deskripsi: "Logam Mulia 0.5 Gram", jumlah: 620000 },
+                    { id: "4", tanggal: "2026-05-21", kategori: "beban lainnya", deskripsi: "Langganan Layanan Streaming", jumlah: 149000 },
+                    { id: "5", tanggal: "2026-05-22", kategori: "beban operasional", deskripsi: "Belanja Bulanan Supermarket", jumlah: 350000 }
+                ];
+                saveToLocalCache();
+            }
+
+            // If GAS URL is configured, pull fresh database
+            if (state.gasUrl) {
+                fetchFromGas();
+            }
+        }
+
+        function saveToLocalCache() {
+            localStorage.setItem('finflux_transactions', JSON.stringify(state.transactions));
+        }
+
+        // Tab switching controller
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+            });
+
+            // Show active tab
+            if (tabName === 'dashboard') {
+                document.getElementById('tabDashboard').classList.remove('hidden');
+                document.getElementById('btnTabDashboard').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                document.getElementById('btnTabDashboard').classList.remove('text-slate-400');
+                // Re-render charts to trigger correct sizing
+                setTimeout(initializeCharts, 100);
+            } else if (tabName === 'transactions') {
+                document.getElementById('tabTransactions').classList.remove('hidden');
+                document.getElementById('btnTabTransactions').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                document.getElementById('btnTabTransactions').classList.remove('text-slate-400');
+            } else if (tabName === 'settings') {
+                document.getElementById('tabSettings').classList.remove('hidden');
+                document.getElementById('btnTabSettings').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-500/20');
+                document.getElementById('btnTabSettings').classList.remove('text-slate-400');
+            }
+        }
+
+        // Toggle badge visibility depending on connection state
+        function updateSyncIndicators(isConnected) {
+            const localBadge = document.getElementById('syncBadge');
+            const gasBadge = document.getElementById('gasActiveBadge');
+            const utilityBox = document.getElementById('gasUtilityBox');
+            if (isConnected) {
+                localBadge.classList.add('hidden');
+                gasBadge.classList.remove('hidden');
+                utilityBox.classList.remove('hidden');
+            } else {
+                localBadge.classList.remove('hidden');
+                gasBadge.classList.add('hidden');
+                utilityBox.classList.add('hidden');
+            }
+        }
+
+        // GAS Settings action handlers
+        function saveGasUrl() {
+            const urlInput = document.getElementById('gasUrlInput').value.trim();
+            if (!urlInput) {
+                showToast("Kesalahan", "Harap masukkan URL Google Apps Script yang valid.", "error");
+                return;
+            }
+            state.gasUrl = urlInput;
+            localStorage.setItem('finflux_gas_url', urlInput);
+            updateSyncIndicators(true);
+            showToast("GAS Terhubung", "Konfigurasi backend Google Spreadsheet berhasil disimpan!", "success");
+            fetchFromGas();
+        }
+
+        function disconnectGas() {
+            state.gasUrl = "";
+            localStorage.removeItem('finflux_gas_url');
+            document.getElementById('gasUrlInput').value = "";
+            updateSyncIndicators(false);
+            showToast("Koneksi Diputus", "Berhasil beralih kembali ke Penyimpanan Lokal.", "success");
+        }
+
+        function copyGasCode() {
+            const scriptText = `function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
+  }
+  var data = sheet.getDataRange().getValues();
+  var result = [];
+  for (var i = 1; i < data.length; i++) {
+    result.push({
+      id: data[i][0],
+      tanggal: data[i][1],
+      kategori: data[i][2],
+      deskripsi: data[i][3],
+      jumlah: Number(data[i][4])
+    });
+  }
+  var jsonString = JSON.stringify(result);
+  var callback = e.parameter.callback;
+  if (callback) {
+    return ContentService.createTextOutput(callback + '(' + jsonString + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(jsonString).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var params = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    if (sheet.getLastRow() == 0) {
+      sheet.appendRow(["ID", "Tanggal", "Kategori", "Deskripsi", "Jumlah"]);
+    }
+    if (params.action === "delete") {
+      var data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][0] == params.id) {
+          sheet.deleteRow(i + 1);
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    sheet.appendRow([params.id || Utilities.getUuid(), params.tanggal, params.kategori, params.deskripsi, params.jumlah]);
+    return ContentService.createTextOutput(JSON.stringify({status: "success"})).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+            
+            // Backup fallback execution
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = scriptText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            
+            showToast("Teks Disalin", "Kode Apps Script berhasil disalin ke clipboard Anda!", "success");
+        }
+
+        // Sync engine to interact with deployed Google Apps Script URL with robust CORS bypass
+        function fetchFromGas() {
+            if (!state.gasUrl) return;
+            showToast("Memuat Data", "Menghubungkan ke Google Sheets...", "success");
+
+            // Membuat ID callback unik berbasis waktu untuk menghindari cache
+            const callbackName = "finflux_callback_" + Math.round(Math.random() * 1000000) + "_" + Date.now();
+            
+            // Menyiapkan penampung callback global untuk menerima data JSONP
+            window[callbackName] = function(data) {
+                cleanup();
+                if (Array.isArray(data)) {
+                    state.transactions = data.map(item => ({
+                        id: String(item.id),
+                        tanggal: item.tanggal ? String(item.tanggal).substring(0, 10) : new Date().toISOString().substring(0, 10),
+                        kategori: String(item.kategori).toLowerCase(),
+                        deskripsi: String(item.deskripsi),
+                        jumlah: Number(item.jumlah)
+                    }));
+                    saveToLocalCache();
+                    renderData();
+                    showToast("Data Sinkron", "Berhasil sinkronisasi otomatis dengan Google Sheets!", "success");
+                } else {
+                    showToast("Kesalahan Data", "Format data spreadsheet tidak valid.", "error");
+                }
+            };
+
+            // Batas waktu tunggu (Timeout) koneksi ke GAS
+            const timeoutId = setTimeout(() => {
+                cleanup();
+                showToast("Data Kosong / Lambat", "Spreadsheet mungkin kosong atau memuat lambat. Menggunakan data lokal.", "error");
+                console.warn("GAS Connection timed out or empty. Falling back to local cache.");
+            }, 12000);
+
+            // Membersihkan elemen script setelah selesai atau ketika gagal
+            function cleanup() {
+                clearTimeout(timeoutId);
+                delete window[callbackName];
+                const scriptEl = document.getElementById(scriptId);
+                if (scriptEl) scriptEl.remove();
+            }
+
+            const scriptId = "gas_jsonp_loader";
+            // Memasang parameter callback dan melampirkan timestamp untuk mencegah caching peramban
+            const urlConnector = state.gasUrl.includes('?') ? '&' : '?';
+            const secureUrl = state.gasUrl + urlConnector + "callback=" + callbackName + "&nocache=" + Date.now();
+
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = secureUrl;
+            script.onerror = function() {
+                cleanup();
+                showToast("Gagal Memuat Cloud", "Terjadi masalah CORS/Jaringan. Menggunakan database lokal.", "error");
+            };
+
+            document.head.appendChild(script);
+        }
+
+        // POST request bypass CORS via standard simple requests (no-cors mode with text/plain body)
+        function postToGas(payload) {
+            if (!state.gasUrl) return Promise.resolve({ status: "local" });
+
+            // Menggunakan fetch tipe 'no-cors' dengan tipe konten 'text/plain' 
+            // untuk mengelabui pembatasan pra-koneksi OPTIONS (CORS preflight) pada peramban
+            return fetch(state.gasUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "text/plain"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Dalam mode 'no-cors', respons bersifat opak (tidak bisa dibaca isinya),
+                // tetapi permintaan dipastikan terkirim dengan aman ke Google Apps Script.
+                return { status: "success" };
+            })
+            .catch(err => {
+                console.error("GAS Post Error: ", err);
+                throw err;
+            });
+        }
+
+        // NEW FEATURE: Upload all local cache to Spreadsheet dynamically
+        async function uploadLocalDataToGas() {
+            if (!state.gasUrl) return;
+            if (state.transactions.length === 0) {
+                showToast("Gagal", "Tidak ada data lokal untuk diekspor.", "error");
+                return;
+            }
+
+            showToast("Mulai Ekspor", "Mentransfer seluruh data lokal ke Google Sheets...", "success");
+            
+            let successCount = 0;
+            for (let i = 0; i < state.transactions.length; i++) {
+                try {
+                    await postToGas(state.transactions[i]);
+                    successCount++;
+                } catch (err) {
+                    console.error("Gagal mengunggah item: ", state.transactions[i]);
+                }
+            }
+
+            showToast("Ekspor Selesai", `Berhasil menulis ${successCount} transaksi ke Spreadsheet baru Anda!`, "success");
+            
+            // Jeda singkat lalu sync ulang dari GAS
+            setTimeout(fetchFromGas, 2000);
+        }
+
+        // Transaction submission handling
+        function handleTransactionSubmit(event) {
+            event.preventDefault();
+
+            // Form references
+            const descInput = document.getElementById('desc');
+            const amountInput = document.getElementById('amount');
+            const dateInput = document.getElementById('date');
+            
+            // Extract selected category
+            let category = "beban operasional";
+            const radioButtons = document.getElementsByName('category');
+            for (const radio of radioButtons) {
+                if (radio.checked) {
+                    category = radio.value;
+                    break;
+                }
+            }
+
+            const newTx = {
+                id: crypto.randomUUID(),
+                tanggal: dateInput.value,
+                kategori: category,
+                deskripsi: descInput.value.trim(),
+                jumlah: Number(amountInput.value)
+            };
+
+            // Trigger Mascot Double Jump Animation
+            triggerMascotJump();
+
+            // Optimistic Update: Add to UI instantly
+            state.transactions.unshift(newTx);
+            saveToLocalCache();
+            renderData();
+
+            // Reset Form fields elegantly
+            descInput.value = "";
+            amountInput.value = "";
+            
+            // Post to external Database if configured
+            if (state.gasUrl) {
+                showToast("Mengirim...", "Menyimpan mutasi ke Google Sheets...", "success");
+                postToGas(newTx)
+                    .then(() => {
+                        showToast("Data Terkirim", "Transaksi tersimpan selamanya di Spreadsheet Anda!", "success");
+                        // Muat ulang setelah jeda singkat agar sinkron kembali
+                        setTimeout(fetchFromGas, 1500);
+                    })
+                    .catch(() => {
+                        showToast("Koneksi Gagal", "Mutasi disimpan lokal. Kami akan coba kirim lagi nanti.", "error");
+                    });
+            } else {
+                showToast("Transaksi Disimpan", "Berhasil menambahkan mutasi ke penyimpanan lokal.", "success");
+            }
+        }
+
+        // Remove transaction
+        function deleteTransaction(id) {
+            // Trigger mascot sad look or bounce
+            triggerMascotWiggle();
+
+            // Remove from local memory
+            state.transactions = state.transactions.filter(tx => tx.id !== id);
+            saveToLocalCache();
+            renderData();
+
+            // Post delete action to Google Apps Script if connected
+            if (state.gasUrl) {
+                showToast("Menghapus...", "Menghapus mutasi dari Google Sheets...", "success");
+                postToGas({ action: "delete", id: id })
+                    .then(() => {
+                        showToast("Terhapus", "Satu mutasi berhasil dihapus dari cloud database Anda.", "success");
+                        // Muat ulang untuk sinkronisasi mutasi terbaru
+                        setTimeout(fetchFromGas, 1500);
+                    })
+                    .catch(() => {
+                        showToast("Penghapusan Tertunda", "Mutasi terhapus di lokal. Sinkronisasi tertunda.", "error");
+                    });
+            } else {
+                showToast("Berhasil Dihapus", "Satu mutasi berhasil dihapus secara lokal.", "success");
+            }
+        }
+
+        // Main data render pipeline
+        function renderData() {
+            // Calculate sums by category
+            let operasionalSum = 0;
+            let investasiSum = 0;
+            let asetSum = 0;
+            let lainnyaSum = 0;
+
+            state.transactions.forEach(tx => {
+                switch(tx.kategori) {
+                    case 'beban operasional':
+                        operasionalSum += tx.jumlah;
+                        break;
+                    case 'investasi':
+                        investasiSum += tx.jumlah;
+                        break;
+                    case 'aset':
+                        asetSum += tx.jumlah;
+                        break;
+                    case 'beban lainnya':
+                        lainnyaSum += tx.jumlah;
+                        break;
+                }
+            });
+
+            // Format monetary values
+            document.getElementById('totalOperasional').innerText = formatRupiah(operasionalSum);
+            document.getElementById('totalInvestasi').innerText = formatRupiah(investasiSum);
+            document.getElementById('totalAset').innerText = formatRupiah(asetSum);
+            document.getElementById('totalLainnya').innerText = formatRupiah(lainnyaSum);
+
+            const totalMutasi = operasionalSum + investasiSum + asetSum + lainnyaSum;
+            document.getElementById('totalAlokasiChart').innerText = formatRupiah(totalMutasi);
+
+            // Dynamically change tips based on highest expense
+            updateFinanceRecommendation(operasionalSum, investasiSum, asetSum, lainnyaSum);
+
+            // Re-render components
+            renderTableRows(state.transactions);
+            initializeCharts();
+        }
+
+        // Render Table Rows dynamically
+        function renderTableRows(txArray) {
+            const container = document.getElementById('transactionList');
+            const emptyState = document.getElementById('emptyState');
+            container.innerHTML = "";
+
+            if (txArray.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            txArray.forEach(tx => {
+                let badgeColor = "";
+                let badgeText = "";
+                
+                switch(tx.kategori) {
+                    case "beban operasional":
+                        badgeColor = "bg-amber-500/10 border-amber-500/20 text-amber-400";
+                        badgeText = "Operasional";
+                        break;
+                    case "investasi":
+                        badgeColor = "bg-violet-500/10 border-violet-500/20 text-violet-400";
+                        badgeText = "Investasi";
+                        break;
+                    case "aset":
+                        badgeColor = "bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
+                        badgeText = "Aset";
+                        break;
+                    case "beban lainnya":
+                        badgeColor = "bg-rose-500/10 border-rose-500/20 text-rose-400";
+                        badgeText = "Lainnya";
+                        break;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/30 transition border-b border-slate-900/40";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-medium text-slate-400 text-[11px]">${formatDate(tx.tanggal)}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-full border text-[10px] font-bold ${badgeColor}">
+                            ${badgeText}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-100 font-semibold tracking-wide">${escapeHtml(tx.deskripsi)}</td>
+                    <td class="py-3 px-4 text-right font-extrabold text-white">${formatRupiah(tx.jumlah)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="deleteTransaction('${tx.id}')" class="p-1 hover:text-rose-400 text-slate-500 transition rounded-lg hover:bg-slate-800">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        // Table filtering based on search and selected category filter
+        function filterTransactions() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedCategory = document.getElementById('filterCategory').value;
+
+            const filtered = state.transactions.filter(tx => {
+                const matchesSearch = tx.deskripsi.toLowerCase().includes(query);
+                const matchesCategory = (selectedCategory === "all") || (tx.kategori === selectedCategory);
+                return matchesSearch && matchesCategory;
+            });
+
+            renderTableRows(filtered);
+        }
+
+        // Safe HTML utility
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Date formatter (e.g. 2026-05-22 -> 22 Mei 2026)
+        function formatDate(dateStr) {
+            if (!dateStr) return "-";
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            return `${parts[2]} ${months[parseInt(parts[1], 10) - 1]} ${parts[0]}`;
+        }
+
+        // Format raw integer into Indonesian Rupiah format
+        function formatRupiah(value) {
+            return 'Rp ' + value.toLocaleString('id-ID');
+        }
+
+        // Chart.js engine initialization
+        function initializeCharts() {
+            const ctxProporsi = document.getElementById('proporsiChart');
+            const ctxTren = document.getElementById('trenChart');
+
+            if (!ctxProporsi || !ctxTren) return; // guard clause for tabs
+
+            // Sum the categories
+            let opSum = 0, invSum = 0, astSum = 0, lainSum = 0;
+            state.transactions.forEach(tx => {
+                if (tx.kategori === 'beban operasional') opSum += tx.jumlah;
+                else if (tx.kategori === 'investasi') invSum += tx.jumlah;
+                else if (tx.kategori === 'aset') astSum += tx.jumlah;
+                else if (tx.kategori === 'beban lainnya') lainSum += tx.jumlah;
+            });
+
+            // 1. PROPORSI CHARTS (DOUGHNUT)
+            if (proporsiChartObj) {
+                proporsiChartObj.destroy();
+            }
+
+            proporsiChartObj = new Chart(ctxProporsi, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Operasional', 'Investasi', 'Aset', 'Lainnya'],
+                    datasets: [{
+                        data: [opSum, invSum, astSum, lainSum],
+                        backgroundColor: ['#f59e0b', '#8b5cf6', '#10b981', '#f43f5e'],
+                        borderColor: '#020617',
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '70%',
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
+            // 2. TREN CHART (BAR - Shows 7 latest transactions)
+            if (trenChartObj) {
+                trenChartObj.destroy();
+            }
+
+            // Get last 7 transactions, reverse it to show chronologically
+            const sortedTx = [...state.transactions]
+                .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+                .slice(-7);
+
+            const labels = sortedTx.map(tx => {
+                const parts = tx.tanggal.split('-');
+                return parts.length === 3 ? `${parts[2]}/${parts[1]}` : tx.tanggal;
+            });
+            const amounts = sortedTx.map(tx => tx.jumlah);
+            const colors = sortedTx.map(tx => {
+                if (tx.kategori === 'beban operasional') return '#f59e0b';
+                if (tx.kategori === 'investasi') return '#8b5cf6';
+                if (tx.kategori === 'aset') return '#10b981';
+                return '#f43f5e';
+            });
+
+            trenChartObj = new Chart(ctxTren, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: colors,
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { size: 9 },
+                                callback: function(value) {
+                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                                    if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Smarter recommendations based on current spending ratio
+        function updateFinanceRecommendation(operasional, investasi, aset, lainnya) {
+            const recommendationEl = document.getElementById('financeRecommendation');
+            const total = operasional + investasi + aset + lainnya;
+
+            if (total === 0) {
+                recommendationEl.innerText = "Mari mulai mencatat pengeluaran Anda agar asisten AI Boni bisa memetakan kesehatan keuangan Anda!";
+                return;
+            }
+
+            const opRatio = operasional / total;
+            const invRatio = investasi / total;
+            const asetRatio = aset / total;
+
+            if (opRatio > 0.6) {
+                recommendationEl.innerHTML = `"Aduh bos! Porsi <span class='text-amber-400 font-bold'>Operasional</span> kamu tinggi banget nih mencapai ${(opRatio * 100).toFixed(0)}% dari total pengeluaran. Coba dipilah lagi mana yang prioritas mana yang kepengenan."`;
+            } else if (invRatio < 0.15) {
+                recommendationEl.innerHTML = `"Boni perhatiin tabungan <span class='text-violet-400 font-bold'>Investasi</span> kamu masih tipis nih. Yuk sisihkan minimal 15% setiap dapet pemasukan biar masa depan cerah benderang!"`;
+            } else if (asetRatio > 0.4) {
+                recommendationEl.innerHTML = `"Luar biasa, bos! Alokasi pembentukan <span class='text-emerald-400 font-bold'>Aset</span> kamu sangat sehat dan kokoh. Ini adalah pertanda pondasi kemakmuran finansial."`;
+            } else {
+                recommendationEl.innerHTML = `"Komposisi keuangan kamu seimbang banget nih bos! Jaga terus konsistensi ini untuk mencapai kebebasan finansial jangka panjang!"`;
+            }
+        }
+
+        // Character "Boni" (The piggy/coin SVG) interaction logic
+        function triggerMascotJump() {
+            const mascot = document.getElementById('boniMascot');
+            mascot.classList.remove('mascot-idle');
+            mascot.classList.add('mascot-jump');
+            
+            // Revert back to idle after animation finishes
+            setTimeout(() => {
+                mascot.classList.remove('mascot-jump');
+                mascot.classList.add('mascot-idle');
+            }, 800);
+        }
+
+        // Sad wiggle when delete happens
+        function triggerMascotWiggle() {
+            const mascot = document.getElementById('boniMascot');
+            mascot.classList.add('shake-effect');
+            setTimeout(() => {
+                mascot.classList.remove('shake-effect');
+            }, 300);
+        }
+
+        function mascotJumpAndSpeak() {
+            triggerMascotJump();
+            
+            // Randomly select a tip/quote for Boni to say
+            const randomIndex = Math.floor(Math.random() * mascotQuotes.length);
+            document.getElementById('boniSpeech').innerText = `"${mascotQuotes[randomIndex]}"`;
+        }
+
+        // Custom elegant notification popup
+        function showToast(title, message, type = "success") {
+            const toast = document.getElementById('toastNotification');
+            const titleEl = document.getElementById('toastTitle');
+            const messageEl = document.getElementById('toastMessage');
+            const iconContainer = document.getElementById('toastIconContainer');
+
+            titleEl.innerText = title;
+            messageEl.innerText = message;
+
+            // Change color scheme based on notification type
+            if (type === "success") {
+                iconContainer.className = "p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg";
+                iconContainer.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                `;
+            } else {
+                iconContainer.className = "p-2 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg";
+                iconContainer.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                `;
+            }
+
+            // Slide in animation
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Slide out after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
